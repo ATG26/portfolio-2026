@@ -60,6 +60,11 @@ html{
   scroll-behavior:smooth;
   overflow-x:clip;    /* clip, not hidden — hidden would make <html> a scroll
                          container and break the sticky hero */
+  /* a light touch, not a hard grab — proximity only nudges the rest
+     position when a scroll already lands close to a snap point, it
+     never fights or truncates a scroll in progress. The hero's own
+     sticky flythrough has no snap point, so it's untouched. */
+  scroll-snap-type:y proximity;
 }
 body{
   margin:0;
@@ -400,6 +405,7 @@ a{color:inherit;text-decoration:none;}
   width:var(--card-w);
   margin-bottom:var(--card-gap);
 }
+.works > .work{scroll-snap-align:start;}
 .works > .work:last-child{margin-bottom:0;}
 .work--right{margin-left:var(--card-offset);}
 
@@ -488,6 +494,7 @@ a{color:inherit;text-decoration:none;}
   min-height:358px;
   background:var(--footer-base);
   color:var(--white);
+  scroll-snap-align:start;
 }
 .footer::before{
   content:"";
