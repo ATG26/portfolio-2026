@@ -371,6 +371,13 @@ a{color:inherit;text-decoration:none;}
   position:relative;
   transform-origin:50% 35%;
   will-change:transform,opacity;
+  /* the card should land centred in the viewport, not pinned to the top
+     under the nav — a full-height flex box centres it regardless of
+     screen size, instead of hand-tuning a fixed offset */
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
 }
 /* No boxy covering panel here anymore — the still-visible hero backdrop
    does that job on its own as it fades late in the travel (see the JS
