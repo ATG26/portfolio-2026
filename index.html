@@ -113,10 +113,6 @@ a{color:inherit;text-decoration:none;}
   pointer-events:none;
   transition:transform .38s cubic-bezier(.4,0,.2,1);
 }
-/* the frame only carries the nav in the hero; keeping it pinned over the
-   work images reads as clutter, so it tucks away on scroll-down and
-   returns on scroll-up */
-.site-nav.is-hidden{transform:translateY(-160%);}
 .site-nav ul{
   pointer-events:auto;
   display:flex;
@@ -752,7 +748,6 @@ a{color:inherit;text-decoration:none;}
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var queued  = false;
   var DEPTH   = 1600;   /* camera distance for the z-space travel */
-  var lastY   = 0;      /* for the scroll-direction nav tuck */
 
   function clamp(v,a,b){ return v < a ? a : (v > b ? b : v); }
   function mix(a,b,t){ return a + (b - a) * t; }
@@ -852,14 +847,6 @@ a{color:inherit;text-decoration:none;}
     rail.style.opacity = (1 - railOut).toFixed(3);
     rail.style.pointerEvents = railOut > .9 ? 'none' : '';
 
-    /* tuck the nav away while reading down the works list */
-    var y = window.scrollY;
-    if(p >= 1 && Math.abs(y - lastY) > 4){
-      nav.classList.toggle('is-hidden', y > lastY);
-    }else if(p < 1){
-      nav.classList.remove('is-hidden');
-    }
-    lastY = y;
   }
 
   function onScroll(){
