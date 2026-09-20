@@ -433,6 +433,10 @@ a{color:inherit;text-decoration:none;}
   filter:blur(18px);
   will-change:opacity,translate,scale,filter;
 }
+/* the card is now a link through to its project page — block, not inline,
+   so it wraps the thumb + meta exactly like the plain div it replaced,
+   with no layout side effects. */
+.work-link{display:block;}
 .work--right .work-reveal{
   translate:425px 225px;   /* mirrored x — same y/scale/opacity as the reference */
 }
@@ -681,6 +685,7 @@ a{color:inherit;text-decoration:none;}
 
       <article class="work">
         <div class="work-reveal">
+          <a class="work-link" href="projects/motion-reel.html" aria-label="View Motion Reel project">
           <div class="work-thumb">
             <img src="assets/images/motion-reel.png" alt="Motion Reel — title card" width="1604" height="902">
           </div>
@@ -688,12 +693,13 @@ a{color:inherit;text-decoration:none;}
             <h3 class="work-title">Motion Reel</h3>
             <span class="work-year">2026</span>
           </div>
-        </div>
+        </a></div>
       </article>
     </div>
 
     <article class="work work--right">
       <div class="work-reveal">
+          <a class="work-link" href="projects/true-detective.html" aria-label="View True Detective project">
         <div class="work-thumb">
           <img src="assets/images/true-detective.jpg" alt="True Detective title sequence" width="1604" height="902" loading="lazy">
         </div>
@@ -701,11 +707,12 @@ a{color:inherit;text-decoration:none;}
           <h3 class="work-title">True Detective Title Sequence</h3>
           <span class="work-year">2025</span>
         </div>
-      </div>
+      </a></div>
     </article>
 
     <article class="work" id="gallery">
       <div class="work-reveal">
+          <a class="work-link" href="projects/five-guys-kiosk.html" aria-label="View Five Guys Kiosk project">
         <div class="work-thumb">
           <img src="assets/images/five-guys-kiosk.jpg" alt="Five Guys ordering kiosk interface" width="1604" height="902" loading="lazy">
         </div>
@@ -713,11 +720,12 @@ a{color:inherit;text-decoration:none;}
           <h3 class="work-title">Five Guys Kiosk</h3>
           <span class="work-year">2026</span>
         </div>
-      </div>
+      </a></div>
     </article>
 
     <article class="work work--right">
       <div class="work-reveal">
+          <a class="work-link" href="projects/nc-drivers-license.html" aria-label="View Nc Drivers License project">
         <div class="work-thumb">
           <img src="assets/images/nc-drivers-license.jpg" alt="North Carolina digital driver's license app" width="1604" height="902" loading="lazy">
         </div>
@@ -725,7 +733,7 @@ a{color:inherit;text-decoration:none;}
           <h3 class="work-title">North Carolina Drivers License</h3>
           <span class="work-year">2026</span>
         </div>
-      </div>
+      </a></div>
     </article>
 
   </main>
