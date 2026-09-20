@@ -846,25 +846,16 @@ a{color:inherit;text-decoration:none;}
            against the still-visible hero backdrop. */
         intro.style.transform = 'translateY(' + hold.toFixed(1) + 'px)';
 
-        /* the card stays fully hidden for the entire travel — it
-           shouldn't be sitting there while the hero is still flying
-           through, only once the works background has actually arrived.
-           Scrolling back up before it lands resets it, so re-entering
-           the transition plays the same reveal again. */
-        introCard.classList.remove('is-scrubbed');
-        if(window.__resetIntroScrub) window.__resetIntroScrub();
-        /* clear any inline styles the scroll-scrubbed system left behind
-           (on the inner .work-reveal, where apply() actually writes) so
-           the base hidden .work-reveal styles take back over cleanly
-           instead of fighting stale inline values, and it replays
-           cleanly next time. */
-        var introReveal = introCard.querySelector('.work-reveal');
-        if(introReveal){
-          introReveal.style.opacity = '';
-          introReveal.style.translate = '';
-          introReveal.style.scale = '';
-          introReveal.style.filter = '';
-        }
+        /* once it's been handed off to the scroll-scrubbed system below
+           (is-scrubbed), leave it owned by that system permanently — it
+           already fades/slides the card out smoothly as the hold pulls
+           #worksIntro back up off-screen while re-entering this travel,
+           exactly like scrolling any other card off. Force-resetting it
+           here used to hard-cut it to hidden instantly (a visible pop),
+           well before the hero backdrop was opaque enough to hide that
+           cut. Before the first reveal, is-scrubbed is simply never set
+           yet, so the scroll-scrubbed system's own guard already leaves
+           it alone until this travel lands the first time. */
 
         var headE = smooth(clamp((p - .38) / .45, 0, 1));
         heading.style.opacity   = headE.toFixed(3);
@@ -927,7 +918,8 @@ a{color:inherit;text-decoration:none;}
      via the z-space transition above, then hands off to this same system
      (once it gets the 'is-scrubbed' class) so it animates back out on
      scroll exactly like its siblings instead of staying pinned visible. */
-  var introCard = document.querySelector('#worksIntro .work');
+  var introWrap = document.getElementById('worksIntro');
+  var introCard = introWrap ? introWrap.querySelector('.work') : null;
   if(introCard) works.push(introCard);
   if(!works.length) return;
 
@@ -943,6 +935,17 @@ a{color:inherit;text-decoration:none;}
   function clamp(v,a,b){ return v < a ? a : (v > b ? b : v); }
 
   function targetFor(el){
+    /* the intro card is pinned in place by the z-space transition above
+       (translateY(hold) on its #worksIntro wrapper) for as long as the
+       hero-to-works travel hasn't fully landed — its bounding rect stays
+       visually centred throughout that hold, which would otherwise read
+       as "fully visible" here even while it's still meant to be hidden.
+       Forcing the target to 0 during the hold, and letting the LERP below
+       ease toward it like normal, is what makes it fade out/in smoothly
+       instead of the hard instant cut this used to do. */
+    if(el === introCard && introWrap.style.transform && introWrap.style.transform !== 'none'){
+      return 0;
+    }
     var vh = window.innerHeight;
     var r = el.getBoundingClientRect();
     var center = (r.top + r.height / 2) - vh / 2;   // 0 = card centred in viewport
@@ -965,10 +968,6 @@ a{color:inherit;text-decoration:none;}
   function tick(){
     var settled = true;
     works.forEach(function(el, i){
-      /* the intro card isn't handed off yet — the z-space transition still
-         keeps it hidden while the hero is still flying through, so leave
-         it alone here and don't let that count against settling either. */
-      if(el === introCard && !el.classList.contains('is-scrubbed')) return;
       var target = targetFor(el);
       var next = current[i] + (target - current[i]) * LERP;
       if(Math.abs(target - next) > EPS) settled = false;
@@ -982,13 +981,6 @@ a{color:inherit;text-decoration:none;}
     if(rafId == null){ rafId = window.requestAnimationFrame(tick); }
   }
   window.__kickWorks = kick;   /* called by the z-space transition on handoff */
-  /* called when scrolling back into the hero hands the card back — resets
-     its LERP "current" to hidden so the next handoff always eases back in
-     from 0 again, same as the first time, rather than picking up stale. */
-  window.__resetIntroScrub = function(){
-    var idx = works.indexOf(introCard);
-    if(idx > -1) current[idx] = 0;
-  };
 
   window.addEventListener('scroll', kick, {passive:true});
   window.addEventListener('resize', kick);
