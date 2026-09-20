@@ -986,7 +986,7 @@ a{color:inherit;text-decoration:none;}
 
   function clamp(v,a,b){ return v < a ? a : (v > b ? b : v); }
 
-  var LERP    = .085;   /* lower = heavier / slower to catch up */
+  var LERP    = .16;    /* lower = heavier / slower to catch up */
   var current = window.scrollY;
   var target  = current;
   var rafId   = null;
@@ -1039,7 +1039,7 @@ a{color:inherit;text-decoration:none;}
 
     /* a slight damping on top of the easing — both together are what
        make the scroll feel slower and more deliberate, not just laggy */
-    target = clamp(target + dy * .82, 0, maxScroll());
+    target = clamp(target + dy * .95, 0, maxScroll());
     kick();
   }, {passive:false});
 
