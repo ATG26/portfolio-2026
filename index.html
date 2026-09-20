@@ -420,7 +420,17 @@ a{color:inherit;text-decoration:none;}
    hero-to-works travel (see the JS below) and only animates on once the
    works section has actually landed — the same left-column entrance as
    its siblings, just triggered after the transition settles instead of
-   during it. */
+   during it. It's a one-shot CSS transition, not scroll-scrubbed like the
+   cards below, so it eases in over a fixed time and then holds still at
+   its resting position — no need to keep scrolling to see it clearly. */
+#worksIntro .work{
+  transition:opacity .9s cubic-bezier(.16,1,.3,1), translate .9s cubic-bezier(.16,1,.3,1), scale .9s cubic-bezier(.16,1,.3,1);
+}
+#worksIntro .work.is-in{
+  opacity:1;
+  translate:none;
+  scale:1;
+}
 @media (prefers-reduced-motion:reduce){
   .work{opacity:1;translate:none;scale:1;}
 }
@@ -794,18 +804,13 @@ a{color:inherit;text-decoration:none;}
         heading.style.transform  = 'none';
         heading.style.opacity    = '1';
 
-        /* the card isn't part of the camera travel at all — it sits dead
-           centre the moment the works section lands, so a viewport-
-           centering check (like the cards below use) would just pop it
-           in instantly. Instead it gets its own short reveal window keyed
-           to the scroll distance PAST the transition, so it genuinely
-           animates on over the next bit of scrolling rather than
-           appearing fully formed. */
-        var settle = clamp((into - room) / 650, 0, 1);
-        var ct = smooth(settle);
-        introCard.style.opacity   = ct.toFixed(3);
-        introCard.style.translate = (-425 * (1 - ct)).toFixed(1) + 'px ' + (225 * (1 - ct)).toFixed(1) + 'px';
-        introCard.style.scale     = (.69 + .31 * ct).toFixed(3);
+        /* the card animates on ONCE, on a timer, the moment the works
+           section lands — not tied to scrolling any further. Chasing it
+           with more scroll distance kept moving it out of view before it
+           finished revealing; a CSS transition lets it ease in over a
+           fixed duration and then just sit still at its natural resting
+           spot, however long you pause there. */
+        introCard.classList.add('is-in');
       }else{
         var hold = -(1 - p) * room;
         /* just a positional hold now — no panel, no opacity of its own.
@@ -815,10 +820,10 @@ a{color:inherit;text-decoration:none;}
 
         /* the card stays fully hidden for the entire travel — it
            shouldn't be sitting there while the hero is still flying
-           through, only once the works background has actually arrived */
-        introCard.style.opacity   = '0';
-        introCard.style.translate = '-425px 225px';
-        introCard.style.scale     = '.69';
+           through, only once the works background has actually arrived.
+           Scrolling back up before it lands resets it, so re-entering
+           the transition plays the same reveal again. */
+        introCard.classList.remove('is-in');
 
         var headE = smooth(clamp((p - .38) / .45, 0, 1));
         heading.style.opacity   = headE.toFixed(3);
