@@ -74,6 +74,30 @@ img{display:block;max-width:100%;}
 a{color:inherit;text-decoration:none;}
 
 /* ============================================================
+   CUSTOM CURSOR — a 36x36 black circle that inverts whatever
+   it passes over via mix-blend-mode. Fine-pointer devices only;
+   touch devices keep the platform default and never get the dot.
+   ============================================================ */
+@media (pointer:fine){
+  body{cursor:none;}
+  .cursor-dot{
+    position:fixed;
+    top:0;left:0;
+    width:36px;height:36px;
+    border-radius:50%;
+    background:#000;
+    mix-blend-mode:difference;
+    pointer-events:none;
+    z-index:9999;
+    transform:translate(-50%,-50%);
+    will-change:transform;
+    opacity:0;               /* hidden until the first real mousemove */
+    transition:opacity .2s ease;
+  }
+  .cursor-dot.is-visible{opacity:1;}
+}
+
+/* ============================================================
    TOP NAV  — frame: x1091 y39, 16px Medium, 38px gaps,
    each item underlined at y56
    ============================================================ */
@@ -490,6 +514,8 @@ a{color:inherit;text-decoration:none;}
 </head>
 <body>
 
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+
 <nav class="site-nav" id="siteNav" aria-label="Primary">
   <ul>
     <li><a href="#home">Home</a></li>
@@ -709,6 +735,18 @@ a{color:inherit;text-decoration:none;}
       if(el) el.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block:'start'});
     });
   });
+})();
+
+/* custom cursor dot — fine pointers only */
+(function(){
+  if(!window.matchMedia('(pointer:fine)').matches) return;
+  var dot = document.getElementById('cursorDot');
+  if(!dot) return;
+  window.addEventListener('mousemove', function(e){
+    dot.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px) translate(-50%,-50%)';
+    if(!dot.classList.contains('is-visible')) dot.classList.add('is-visible');
+  }, {passive:true});
+  document.addEventListener('mouseleave', function(){ dot.classList.remove('is-visible'); });
 })();
 </script>
 </body>
