@@ -312,6 +312,95 @@ a{color:inherit;text-decoration:none;}
   100%{transform:translate3d(0,0,0) scale(1);}
 }
 
+/* ============================================================
+   WORKS AURA — the same aurora glow as the hero, carried into the
+   works section so the two feel like one continuous atmosphere
+   instead of a hard cut from dark-and-glowing to flat white. Same
+   gradient shapes and auraFloat keyframes as the hero (reused, not
+   duplicated) — but mix-blend-mode:multiply instead of :screen,
+   since screen only adds light and would do nothing against a white
+   background; multiply tints the white with soft color instead.
+   The rgb(255,255,255) stop in each gradient still reads as a
+   "highlight" here too — multiplying by white is a no-op, so that
+   band simply stays paper-white, same visual role as the hero's.
+
+   position:sticky (not absolute) so it stays in view as you scroll
+   through the whole card list, matching the hero's continuous
+   motion, rather than just being a static image parked at the top.
+   The negative bottom margin cancels its own height so it doesn't
+   push the cards down; the negative side margins break it out of
+   .works's max-width so it spans the full viewport width like the
+   hero does. */
+.works-aura{
+  position:sticky;
+  top:0;
+  left:0;
+  height:100vh;
+  width:100vw;
+  margin:0 calc(-50vw + 50%) calc(-100vh);
+  overflow:hidden;
+  z-index:-1;
+  pointer-events:none;
+}
+.works-aura-layer-1{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(154deg, transparent 18%, rgba(12,72,61,0.06) 29%, rgba(0,229,255,0.40) 36%, rgb(255,255,255) 42%, rgba(73,207,158,0.32) 48%, rgba(38,158,119,0.22) 55%, rgba(0,183,255,0.30) 62%, rgba(15,76,65,0.08) 68%, transparent 82%);
+  mix-blend-mode:multiply;
+  filter:blur(122px);
+  opacity:.55;
+  will-change:transform;
+  pointer-events:none;
+  animation:auraFloat1 11s ease-in-out infinite;
+}
+.works-aura-layer-2{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(128deg, transparent 28%, rgba(15,82,96,0.06) 38%, rgba(0,183,255,0.35) 43%, rgb(255,255,255) 48%, rgba(68,197,185,0.22) 52%, rgba(0,229,255,0.25) 57%, rgba(25,105,112,0.10) 62%, transparent 76%);
+  mix-blend-mode:multiply;
+  filter:blur(108px);
+  opacity:.5;
+  will-change:transform;
+  pointer-events:none;
+  animation:auraFloat2 13s ease-in-out infinite;
+  animation-delay:-5s;
+}
+.works-aura-layer-3{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse 78% 20% at 51% 53%, rgba(65,183,155,0.24) 0%, rgba(30,102,91,0.10) 45%, transparent 82%);
+  mix-blend-mode:multiply;
+  filter:blur(101px);
+  opacity:.5;
+  will-change:transform;
+  pointer-events:none;
+  animation:auraFloat3 10s ease-in-out infinite;
+  animation-delay:-2s;
+}
+.works-aura-layer-4{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse 48% 9% at 52% 50%, rgba(190,255,226,0.14) 0%, rgba(91,195,163,0.06) 45%, transparent 80%);
+  mix-blend-mode:multiply;
+  filter:blur(252px);
+  will-change:transform;
+  pointer-events:none;
+  animation:auraFloat4 15s ease-in-out infinite;
+  animation-delay:-8s;
+}
+.works-aura-layer-6{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse 50% 28% at 72% 18%, rgba(89,62,151,0.10) 0%, rgba(57,44,100,0.04) 45%, transparent 82%);
+  mix-blend-mode:multiply;
+  filter:blur(198px);
+  animation:auraFloat6 14s ease-in-out infinite;
+  animation-delay:-6s;
+  opacity:.45;
+  will-change:transform;
+  pointer-events:none;
+}
+
 .hero-inner{
   position:relative;
   z-index:1;            /* keep the wordmark above the aura layers */
@@ -589,6 +678,11 @@ a{color:inherit;text-decoration:none;}
   .aura-layer-4{filter:blur(175px);}
   .aura-layer-5{filter:blur(80px);}
   .aura-layer-6{filter:blur(138px);}
+  .works-aura-layer-1{filter:blur(85px);}
+  .works-aura-layer-2{filter:blur(75px);}
+  .works-aura-layer-3{filter:blur(70px);}
+  .works-aura-layer-4{filter:blur(175px);}
+  .works-aura-layer-6{filter:blur(138px);}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -596,7 +690,7 @@ a{color:inherit;text-decoration:none;}
   .hero,.works-intro,.works-heading{transform:none !important;opacity:1 !important;}
   .hero-block{opacity:1 !important;filter:none !important;}
   .work-thumb img{transition:none;}
-  .aura-layer-1,.aura-layer-2,.aura-layer-3,.aura-layer-4,.aura-layer-5,.aura-layer-6{animation:none;}
+  .aura-layer-1,.aura-layer-2,.aura-layer-3,.aura-layer-4,.aura-layer-5,.aura-layer-6,.works-aura-layer-1,.works-aura-layer-2,.works-aura-layer-3,.works-aura-layer-4,.works-aura-layer-6{animation:none;}
 }
 </style>
 </head>
@@ -670,6 +764,14 @@ a{color:inherit;text-decoration:none;}
 
   <!-- ---------------- WORKS ---------------- -->
   <main class="works">
+
+    <div class="works-aura" aria-hidden="true">
+      <div class="works-aura-layer-1"></div>
+      <div class="works-aura-layer-2"></div>
+      <div class="works-aura-layer-3"></div>
+      <div class="works-aura-layer-4"></div>
+      <div class="works-aura-layer-6"></div>
+    </div>
 
     <div class="works-intro" id="worksIntro">
       <h2 class="works-heading" id="works"></h2>
