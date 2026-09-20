@@ -1029,18 +1029,18 @@ a{color:inherit;text-decoration:none;}
   });
 })();
 
-/* a light ease on wheel/trackpad scroll — NOT the heavier damped version
-   tried earlier (that one visibly lagged behind fast input, then had to
-   catch up in a rush, which read as "slow then snaps"). This one keeps
-   the LERP factor high (.4) so it's really just smoothing out the very
-   edge of each wheel tick into a tiny glide rather than a hard step —
-   the total distance per tick is untouched, only how it's delivered. */
+/* a very subtle ease on wheel/trackpad scroll — the .4 version was still
+   too noticeable, so this keeps the LERP factor even higher (.75),
+   converging in under ~50ms — just enough to round off the hard step of
+   raw wheel input into a hair of a glide, without feeling like eased
+   scrolling at all. The total distance per tick is untouched, only how
+   it's delivered. */
 (function(){
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   function clamp(v,a,b){ return v < a ? a : (v > b ? b : v); }
 
-  var LERP    = .4;
+  var LERP    = .75;
   var current = window.scrollY;
   var target  = current;
   var rafId   = null;
