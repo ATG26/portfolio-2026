@@ -424,26 +424,11 @@ a{color:inherit;text-decoration:none;}
   translate:425px 225px;   /* mirrored x — same y/scale/opacity as the reference */
 }
 /* the Motion Reel card inside #worksIntro stays hidden through the whole
-   hero-to-works travel (see the JS below) and only animates on once the
-   works section has actually landed — the same left-column entrance as
-   its siblings, just triggered after the transition settles instead of
-   during it. It's a one-shot CSS transition, not scroll-scrubbed like the
-   cards below, so it eases in over a fixed time and then holds still at
-   its resting position — no need to keep scrolling to see it clearly. */
-#worksIntro .work{
-  transition:opacity .9s cubic-bezier(.16,1,.3,1), translate .9s cubic-bezier(.16,1,.3,1), scale .9s cubic-bezier(.16,1,.3,1);
-}
-#worksIntro .work.is-in{
-  opacity:1;
-  translate:none;
-  scale:1;
-}
-/* once handed off to the scroll-scrubbed system (below, in JS), the JS
-   drives opacity/translate/scale every frame — a .9s transition on top of
-   that would just lag one frame behind the real scroll position. */
-#worksIntro .work.is-scrubbed{
-  transition:none;
-}
+   hero-to-works travel (see the JS below) and only starts animating once
+   the works section has actually landed — at that point it's handed off
+   to the exact same scroll-scrubbed system the cards below use (see the
+   script at the bottom of the page), so it eases on and back off exactly
+   like its siblings instead of a separately-timed one-shot transition. */
 @media (prefers-reduced-motion:reduce){
   .work{opacity:1;translate:none;scale:1;}
 }
@@ -758,7 +743,6 @@ a{color:inherit;text-decoration:none;}
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var queued  = false;
   var DEPTH   = 1600;   /* camera distance for the z-space travel */
-  var introSettleTimer = null;   /* handoff delay to the scroll-scrubbed system below */
 
   function clamp(v,a,b){ return v < a ? a : (v > b ? b : v); }
   function mix(a,b,t){ return a + (b - a) * t; }
@@ -817,24 +801,13 @@ a{color:inherit;text-decoration:none;}
         heading.style.transform  = 'none';
         heading.style.opacity    = '1';
 
-        /* the card animates on ONCE, on a timer, the moment the works
-           section lands — not tied to scrolling any further. Chasing it
-           with more scroll distance kept moving it out of view before it
-           finished revealing; a CSS transition lets it ease in over a
-           fixed duration and then just sit still at its natural resting
-           spot, however long you pause there. */
-        introCard.classList.add('is-in');
-        /* once the one-shot reveal has had time to finish, hand the card
+        /* the moment the works section lands, hand the card straight
            off to the same scroll-scrubbed system the cards below use —
-           so it animates back out on scroll same as its siblings, instead
-           of just sitting fully visible forever once landed. */
-        if(!introCard.classList.contains('is-scrubbed') && introSettleTimer == null){
-          introSettleTimer = setTimeout(function(){
-            introCard.classList.add('is-scrubbed');
-            introSettleTimer = null;
-            if(window.__primeIntroScrub) window.__primeIntroScrub();
-            if(window.__kickWorks) window.__kickWorks();
-          }, 950);
+           it eases on from hidden and back off on scroll exactly like
+           its siblings, instead of a separately-timed one-shot reveal. */
+        if(!introCard.classList.contains('is-scrubbed')){
+          introCard.classList.add('is-scrubbed');
+          if(window.__kickWorks) window.__kickWorks();
         }
       }else{
         var hold = -(1 - p) * room;
@@ -848,12 +821,11 @@ a{color:inherit;text-decoration:none;}
            through, only once the works background has actually arrived.
            Scrolling back up before it lands resets it, so re-entering
            the transition plays the same reveal again. */
-        introCard.classList.remove('is-in');
         introCard.classList.remove('is-scrubbed');
-        if(introSettleTimer != null){ clearTimeout(introSettleTimer); introSettleTimer = null; }
+        if(window.__resetIntroScrub) window.__resetIntroScrub();
         /* clear any inline styles the scroll-scrubbed system left behind so
-           the base hidden .work styles (and the CSS transition) take back
-           over cleanly instead of fighting stale inline values. */
+           the base hidden .work styles take back over cleanly instead of
+           fighting stale inline values, and it replays cleanly next time. */
         introCard.style.opacity = '';
         introCard.style.translate = '';
         introCard.style.scale = '';
@@ -947,9 +919,9 @@ a{color:inherit;text-decoration:none;}
   function tick(){
     var settled = true;
     works.forEach(function(el, i){
-      /* the intro card isn't handed off yet — leave it alone, the z-space
-         transition still owns it (via the CSS transition + is-in class),
-         and don't let that count against settling either. */
+      /* the intro card isn't handed off yet — the z-space transition still
+         keeps it hidden while the hero is still flying through, so leave
+         it alone here and don't let that count against settling either. */
       if(el === introCard && !el.classList.contains('is-scrubbed')) return;
       var target = targetFor(el);
       var next = current[i] + (target - current[i]) * LERP;
@@ -964,13 +936,12 @@ a{color:inherit;text-decoration:none;}
     if(rafId == null){ rafId = window.requestAnimationFrame(tick); }
   }
   window.__kickWorks = kick;   /* called by the z-space transition on handoff */
-  /* the intro card is always fully revealed (p=1: opacity 1, scale 1,
-     centred) the instant the CSS transition finishes and handoff happens
-     — prime its LERP "current" to match so it picks up from there instead
-     of chasing back up from 0 and visibly flashing hidden first. */
-  window.__primeIntroScrub = function(){
+  /* called when scrolling back into the hero hands the card back — resets
+     its LERP "current" to hidden so the next handoff always eases back in
+     from 0 again, same as the first time, rather than picking up stale. */
+  window.__resetIntroScrub = function(){
     var idx = works.indexOf(introCard);
-    if(idx > -1) current[idx] = 1;
+    if(idx > -1) current[idx] = 0;
   };
 
   window.addEventListener('scroll', kick, {passive:true});
