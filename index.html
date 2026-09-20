@@ -133,10 +133,13 @@ a{color:inherit;text-decoration:none;}
   color:var(--white);
   padding-bottom:6px;
   border-bottom:1px solid currentColor;
-  transition:color .4s ease, opacity .2s ease;
+  transition:opacity .2s ease;
+  /* always white, inverted against whatever's underneath — same trick as
+     the cursor dot, so it reads on both the dark hero and the white
+     works section without needing the old on-light color swap */
+  mix-blend-mode:difference;
 }
 .site-nav a:hover{opacity:.65;}
-.site-nav.on-light a{color:var(--ink);}
 
 /* ============================================================
    RIGHT RAIL — frame: 4 x 40x40 @ x1376, 19px gaps,
