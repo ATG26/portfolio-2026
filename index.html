@@ -765,14 +765,16 @@ a{color:inherit;text-decoration:none;}
         heroSub.style.opacity    = '1';
         hero.style.opacity       = '1';
       }else{
+        /* name and subhead now travel together, at the same rate — one
+           unit flying through the camera rather than two independent
+           layers of parallax */
         var nameE = smooth(clamp(p / .8, 0, 1));
-        var subE  = smooth(clamp((p - .08) / .8, 0, 1));
         heroName.style.transform =
           'perspective(' + DEPTH + 'px) translateZ(' + mix(0,950,nameE).toFixed(1) + 'px)';
         heroName.style.opacity   = mix(1,0,clamp((p - .42) / .38,0,1)).toFixed(3);
         heroSub.style.transform =
-          'perspective(' + DEPTH + 'px) translateZ(' + mix(0,600,subE).toFixed(1) + 'px)';
-        heroSub.style.opacity    = mix(1,0,clamp((p - .52) / .38,0,1)).toFixed(3);
+          'perspective(' + DEPTH + 'px) translateZ(' + mix(0,950,nameE).toFixed(1) + 'px)';
+        heroSub.style.opacity    = mix(1,0,clamp((p - .42) / .38,0,1)).toFixed(3);
         /* the dark backdrop is what the works content scales in against —
            it stays put and fully visible while the card and heading grow
            in front of it, then dissolves late so the plain page white
