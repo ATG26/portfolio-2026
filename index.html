@@ -764,46 +764,70 @@ a{color:inherit;text-decoration:none;}
 })();
 
 /* card reveal, scroll-scrubbed — motion referenced from the "Aniref"
-   frame, but driven directly by scroll position (not a one-shot
-   trigger) so each card animates back out as you scroll away from
-   it, whichever direction that is. Progress is 1 when a card is
-   centred in the viewport and falls off toward 0 as it approaches
-   either edge, mirroring in from the left or right per its column. */
+   frame, driven by scroll position so each card animates back out
+   as you scroll away from it, whichever direction that is. Progress
+   is 1 when a card is centred in the viewport and falls off toward
+   0 as it approaches either edge, mirroring in from the left or
+   right per its column.
+
+   The RAW target is recomputed from scroll position every frame,
+   but what actually gets applied is LERPed toward that target
+   rather than snapping straight to it — so a fast flick-scroll
+   doesn't jump-cut the cards, it just has them catch up smoothly
+   over the next few frames. The loop keeps running (not only on
+   the scroll event) for exactly that catch-up window, then goes
+   idle again once every card has settled. */
 (function(){
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(reducedMotion) return;   /* CSS already renders the resting, visible state */
   var works = Array.prototype.slice.call(document.querySelectorAll('.work'));
   if(!works.length) return;
 
-  var queued = false;
+  var LERP = .1;     /* lower = slower to catch up to the scroll target */
+  var EPS  = .0015;
+  var current = works.map(function(){ return 0; });
+  var rafId = null;
+
   function clamp(v,a,b){ return v < a ? a : (v > b ? b : v); }
 
-  function update(){
-    queued = false;
+  function targetFor(el){
     var vh = window.innerHeight;
-    works.forEach(function(el){
-      var r = el.getBoundingClientRect();
-      var center = (r.top + r.height / 2) - vh / 2;   // 0 = card centred in viewport
-      var span = vh / 2 + r.height / 2;                // distance to fully offscreen
-      var t = clamp(1 - Math.abs(center) / span, 0, 1);
-      var p = clamp(t * 1.5, 0, 1);                     // reach full visibility a bit before dead-centre
-      var fromRight = el.classList.contains('work--right');
-      var x = (fromRight ? 425 : -425) * (1 - p);
-      var y = 225 * (1 - p);
-      var s = .69 + .31 * p;
-      el.style.opacity = p;
-      el.style.translate = x.toFixed(1) + 'px ' + y.toFixed(1) + 'px';
-      el.style.scale = s.toFixed(3);
-    });
+    var r = el.getBoundingClientRect();
+    var center = (r.top + r.height / 2) - vh / 2;   // 0 = card centred in viewport
+    var span = vh / 2 + r.height / 2;                // distance to fully offscreen
+    var t = clamp(1 - Math.abs(center) / span, 0, 1);
+    return clamp(t * 1.5, 0, 1);                      // reach full visibility a bit before dead-centre
   }
 
-  function onScroll(){
-    if(!queued){ queued = true; window.requestAnimationFrame(update); }
+  function apply(el, p, fromRight){
+    var x = (fromRight ? 425 : -425) * (1 - p);
+    var y = 225 * (1 - p);
+    var s = .69 + .31 * p;
+    el.style.opacity = p;
+    el.style.translate = x.toFixed(1) + 'px ' + y.toFixed(1) + 'px';
+    el.style.scale = s.toFixed(3);
   }
-  window.addEventListener('scroll', onScroll, {passive:true});
-  window.addEventListener('resize', onScroll);
-  window.addEventListener('load', onScroll);
-  update();
+
+  function tick(){
+    var settled = true;
+    works.forEach(function(el, i){
+      var target = targetFor(el);
+      var next = current[i] + (target - current[i]) * LERP;
+      if(Math.abs(target - next) > EPS) settled = false;
+      current[i] = next;
+      apply(el, next, el.classList.contains('work--right'));
+    });
+    rafId = settled ? null : window.requestAnimationFrame(tick);
+  }
+
+  function kick(){
+    if(rafId == null){ rafId = window.requestAnimationFrame(tick); }
+  }
+
+  window.addEventListener('scroll', kick, {passive:true});
+  window.addEventListener('resize', kick);
+  window.addEventListener('load', kick);
+  kick();
 })();
 
 /* custom cursor dot — fine pointers only */
