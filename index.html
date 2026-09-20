@@ -345,7 +345,12 @@ a{color:inherit;text-decoration:none;}
      affecting layout; the soft shadow reads as a lit plane hanging in front
      of the dark one, and falls outside the viewport once it lands */
   box-shadow:0 0 0 2px var(--white), 0 40px 140px rgba(0,0,0,.55);
+  /* this panel (and its blurred shadow) only earns its keep during the
+     hero-to-works transition — once the scroll settles it should be
+     gone, not sitting behind the cards below as a stray gradient */
+  transition:opacity .5s ease;
 }
+.works-intro.is-settled::before{opacity:0;}
 .works-heading{
   margin:0 0 56px;
   font-size:clamp(28px,2.78vw,40px);
@@ -706,7 +711,9 @@ a{color:inherit;text-decoration:none;}
       if(p >= 1){
         intro.style.transform = 'none';   /* snap to clean pixels when settled */
         intro.style.opacity   = '1';
+        intro.classList.add('is-settled');   /* fades out the reveal-panel shadow */
       }else{
+        intro.classList.remove('is-settled');
         var hold = -(1 - p) * room;
         intro.style.transform =
           'translateY(' + hold.toFixed(1) + 'px) ' +
