@@ -414,13 +414,11 @@ a{color:inherit;text-decoration:none;}
 .work--right{
   translate:425px 225px;   /* mirrored x — same y/scale/opacity as the reference */
 }
-/* the Motion Reel card inside #worksIntro isn't part of that left/right
-   column reveal — it's driven by the z-space transition instead, scaling
-   in from behind rather than sliding in from a side */
-#worksIntro .work{
-  translate:none;
-  scale:.55;
-}
+/* the Motion Reel card inside #worksIntro stays hidden through the whole
+   hero-to-works travel (see the JS below) and only animates on once the
+   works section has actually landed — the same left-column entrance as
+   its siblings, just triggered after the transition settles instead of
+   during it. */
 @media (prefers-reduced-motion:reduce){
   .work{opacity:1;translate:none;scale:1;}
 }
@@ -744,6 +742,7 @@ a{color:inherit;text-decoration:none;}
      the travel and the far plane lunges at you in the first few pixels. */
   function smooth(t){ return t * t * (3 - 2 * t); }
 
+
   function frame(){
     queued = false;
 
@@ -792,24 +791,32 @@ a{color:inherit;text-decoration:none;}
         intro.style.transform    = 'none';   /* snap to clean pixels when settled */
         heading.style.transform  = 'none';
         heading.style.opacity    = '1';
-        introCard.style.scale    = '1';
-        introCard.style.opacity  = '1';
+
+        /* the card isn't part of the camera travel at all — it sits dead
+           centre the moment the works section lands, so a viewport-
+           centering check (like the cards below use) would just pop it
+           in instantly. Instead it gets its own short reveal window keyed
+           to the scroll distance PAST the transition, so it genuinely
+           animates on over the next bit of scrolling rather than
+           appearing fully formed. */
+        var settle = clamp((into - room) / 260, 0, 1);
+        var ct = smooth(settle);
+        introCard.style.opacity   = ct.toFixed(3);
+        introCard.style.translate = (-425 * (1 - ct)).toFixed(1) + 'px ' + (225 * (1 - ct)).toFixed(1) + 'px';
+        introCard.style.scale     = (.69 + .31 * ct).toFixed(3);
       }else{
         var hold = -(1 - p) * room;
         /* just a positional hold now — no panel, no opacity of its own.
-           The content sitting on it (card + heading) carries the entire
-           reveal by scaling in from behind, against the still-visible
-           hero backdrop. */
+           The heading carries the reveal by scaling in from behind,
+           against the still-visible hero backdrop. */
         intro.style.transform = 'translateY(' + hold.toFixed(1) + 'px)';
 
-        /* CONTENT — the card leads, scaling up from behind as
-           it arrives; the heading follows a beat later. Both come from
-           smaller-than-life rather than sliding in flat, so it still
-           reads as travelling toward the camera, just without a boxy
-           container doing the travelling. */
-        var cardE = smooth(clamp((p - .1) / .45, 0, 1));
-        introCard.style.opacity = cardE.toFixed(3);
-        introCard.style.scale   = mix(.55,1,cardE).toFixed(3);
+        /* the card stays fully hidden for the entire travel — it
+           shouldn't be sitting there while the hero is still flying
+           through, only once the works background has actually arrived */
+        introCard.style.opacity   = '0';
+        introCard.style.translate = '-425px 225px';
+        introCard.style.scale     = '.69';
 
         var headE = smooth(clamp((p - .38) / .45, 0, 1));
         heading.style.opacity   = headE.toFixed(3);
