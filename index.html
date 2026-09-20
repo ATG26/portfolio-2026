@@ -320,7 +320,7 @@ a{color:inherit;text-decoration:none;}
 .hero-block{
   /* the frame sits the wordmark slightly above true centre */
   transform:translateY(-3.4vh);
-  will-change:transform,opacity;
+  will-change:transform,opacity,filter;
   backface-visibility:hidden;
 }
 .hero-name{
@@ -581,7 +581,7 @@ a{color:inherit;text-decoration:none;}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto;}
   .hero,.works-intro,.works-heading{transform:none !important;opacity:1 !important;}
-  .hero-block{opacity:1 !important;}
+  .hero-block{opacity:1 !important;filter:none !important;}
   .work-thumb img{transition:none;}
   .aura-layer-1,.aura-layer-2,.aura-layer-3,.aura-layer-4,.aura-layer-5,.aura-layer-6{animation:none;}
 }
@@ -771,6 +771,7 @@ a{color:inherit;text-decoration:none;}
       if(p <= 0){
         heroBlock.style.transform = 'translateY(-3.4vh)';
         heroBlock.style.opacity   = '1';
+        heroBlock.style.filter    = 'none';
         hero.style.opacity        = '1';
       }else{
         /* name and subhead are one rigid block now — a single transform
@@ -784,8 +785,12 @@ a{color:inherit;text-decoration:none;}
           'translateY(-3.4vh) perspective(' + DEPTH + 'px) translateZ(' + mix(0,950,nameE).toFixed(1) + 'px)';
         /* text fades to zero FIRST, fully finishing before the backdrop
            even starts — a clean sequential handoff instead of the two
-           dissolving on top of each other. */
-        heroBlock.style.opacity  = mix(1,0,clamp((p - .3) / .3,0,1)).toFixed(3);
+           dissolving on top of each other. Blur ramps up over the same
+           stretch, in step with the fade, so it reads as flying out of
+           focus into the camera rather than just dissolving flat. */
+        var textE = clamp((p - .3) / .3, 0, 1);
+        heroBlock.style.opacity  = mix(1,0,textE).toFixed(3);
+        heroBlock.style.filter   = textE > .002 ? 'blur(' + mix(0,26,textE).toFixed(1) + 'px)' : 'none';
         /* the backdrop only begins once the text is completely gone, then
            dissolves on its own to let the works content (already scaling
            in against it) take over cleanly. */
