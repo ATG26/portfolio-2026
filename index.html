@@ -161,7 +161,8 @@ a{color:inherit;text-decoration:none;}
   transition:opacity .3s ease, transform .3s ease;
 }
 .rail-link svg{width:20.16px;height:20.16px;display:block;fill:currentColor;}
-.rail-link:hover{opacity:1;transform:scale(1.2);}
+.rail-link.is-hovered{opacity:1;transform:scale(1.4);}
+.rail-link.is-neighbor{opacity:1;transform:scale(1.2);}
 
 /* ============================================================
    Z-SPACE STAGE
@@ -853,6 +854,27 @@ a{color:inherit;text-decoration:none;}
     if(!dot.classList.contains('is-visible')) dot.classList.add('is-visible');
   }, {passive:true});
   document.addEventListener('mouseleave', function(){ dot.classList.remove('is-visible'); });
+})();
+
+/* rail icon hover field — hovered icon scales 1.4, its immediate neighbor scales 1.2 */
+(function(){
+  var rail = document.getElementById('rail');
+  if(!rail) return;
+  var links = Array.prototype.slice.call(rail.querySelectorAll('.rail-link'));
+
+  function clear(){
+    links.forEach(function(l){ l.classList.remove('is-hovered','is-neighbor'); });
+  }
+
+  links.forEach(function(link, i){
+    link.addEventListener('mouseenter', function(){
+      clear();
+      link.classList.add('is-hovered');
+      if(links[i-1]) links[i-1].classList.add('is-neighbor');
+      if(links[i+1]) links[i+1].classList.add('is-neighbor');
+    });
+    link.addEventListener('mouseleave', clear);
+  });
 })();
 </script>
 </body>
