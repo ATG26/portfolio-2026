@@ -217,6 +217,15 @@ a{color:inherit;text-decoration:none;}
 }
 .project-media img{width:100%;height:100%;object-fit:cover;}
 
+/* a secondary, wider supporting image inside a two-column section
+   (e.g. a full UI-flow strip under the Approach copy) */
+.project-media--wide{
+  aspect-ratio:2777 / 894;
+  margin-top:48px;
+  margin-bottom:0;
+}
+.project-media--dark{background:#141414;}
+
 .project-back{
   display:inline-flex;
   align-items:center;
