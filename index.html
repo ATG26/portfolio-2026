@@ -774,13 +774,14 @@ a{color:inherit;text-decoration:none;}
         var nameE = smooth(clamp(p / .8, 0, 1));
         heroBlock.style.transform =
           'translateY(-3.4vh) perspective(' + DEPTH + 'px) translateZ(' + mix(0,950,nameE).toFixed(1) + 'px)';
-        heroBlock.style.opacity   = mix(1,0,clamp((p - .42) / .38,0,1)).toFixed(3);
-        /* the dark backdrop is what the works content scales in against —
-           it stays put and fully visible while the card and heading grow
-           in front of it, then dissolves late so the plain page white
-           takes over cleanly at the very end. No separate covering panel
-           needed for any of this. */
-        hero.style.opacity       = mix(1,0,clamp((p - .62) / .36,0,1)).toFixed(3);
+        /* text fades to zero FIRST, fully finishing before the backdrop
+           even starts — a clean sequential handoff instead of the two
+           dissolving on top of each other. */
+        heroBlock.style.opacity  = mix(1,0,clamp((p - .3) / .3,0,1)).toFixed(3);
+        /* the backdrop only begins once the text is completely gone, then
+           dissolves on its own to let the works content (already scaling
+           in against it) take over cleanly. */
+        hero.style.opacity       = mix(1,0,clamp((p - .6) / .32,0,1)).toFixed(3);
       }
       hero.style.pointerEvents = p > .5 ? 'none' : '';
 
