@@ -801,7 +801,7 @@ a{color:inherit;text-decoration:none;}
            to the scroll distance PAST the transition, so it genuinely
            animates on over the next bit of scrolling rather than
            appearing fully formed. */
-        var settle = clamp((into - room) / 260, 0, 1);
+        var settle = clamp((into - room) / 650, 0, 1);
         var ct = smooth(settle);
         introCard.style.opacity   = ct.toFixed(3);
         introCard.style.translate = (-425 * (1 - ct)).toFixed(1) + 'px ' + (225 * (1 - ct)).toFixed(1) + 'px';
