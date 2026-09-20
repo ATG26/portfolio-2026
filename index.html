@@ -438,6 +438,12 @@ a{color:inherit;text-decoration:none;}
   translate:none;
   scale:1;
 }
+/* once handed off to the scroll-scrubbed system (below, in JS), the JS
+   drives opacity/translate/scale every frame — a .9s transition on top of
+   that would just lag one frame behind the real scroll position. */
+#worksIntro .work.is-scrubbed{
+  transition:none;
+}
 @media (prefers-reduced-motion:reduce){
   .work{opacity:1;translate:none;scale:1;}
 }
@@ -752,6 +758,7 @@ a{color:inherit;text-decoration:none;}
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var queued  = false;
   var DEPTH   = 1600;   /* camera distance for the z-space travel */
+  var introSettleTimer = null;   /* handoff delay to the scroll-scrubbed system below */
 
   function clamp(v,a,b){ return v < a ? a : (v > b ? b : v); }
   function mix(a,b,t){ return a + (b - a) * t; }
@@ -817,6 +824,18 @@ a{color:inherit;text-decoration:none;}
            fixed duration and then just sit still at its natural resting
            spot, however long you pause there. */
         introCard.classList.add('is-in');
+        /* once the one-shot reveal has had time to finish, hand the card
+           off to the same scroll-scrubbed system the cards below use —
+           so it animates back out on scroll same as its siblings, instead
+           of just sitting fully visible forever once landed. */
+        if(!introCard.classList.contains('is-scrubbed') && introSettleTimer == null){
+          introSettleTimer = setTimeout(function(){
+            introCard.classList.add('is-scrubbed');
+            introSettleTimer = null;
+            if(window.__primeIntroScrub) window.__primeIntroScrub();
+            if(window.__kickWorks) window.__kickWorks();
+          }, 950);
+        }
       }else{
         var hold = -(1 - p) * room;
         /* just a positional hold now — no panel, no opacity of its own.
@@ -830,6 +849,14 @@ a{color:inherit;text-decoration:none;}
            Scrolling back up before it lands resets it, so re-entering
            the transition plays the same reveal again. */
         introCard.classList.remove('is-in');
+        introCard.classList.remove('is-scrubbed');
+        if(introSettleTimer != null){ clearTimeout(introSettleTimer); introSettleTimer = null; }
+        /* clear any inline styles the scroll-scrubbed system left behind so
+           the base hidden .work styles (and the CSS transition) take back
+           over cleanly instead of fighting stale inline values. */
+        introCard.style.opacity = '';
+        introCard.style.translate = '';
+        introCard.style.scale = '';
 
         var headE = smooth(clamp((p - .38) / .45, 0, 1));
         heading.style.opacity   = headE.toFixed(3);
@@ -883,10 +910,13 @@ a{color:inherit;text-decoration:none;}
 (function(){
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(reducedMotion) return;   /* CSS already renders the resting, visible state */
-  /* excludes the Motion Reel card inside #worksIntro — that one is
-     choreographed by the z-space transition above, not this generic
-     column reveal, so the two don't fight over its transform each frame */
   var works = Array.prototype.slice.call(document.querySelectorAll('.works > .work'));
+  /* the Motion Reel card inside #worksIntro plays its own one-shot landing
+     via the z-space transition above, then hands off to this same system
+     (once it gets the 'is-scrubbed' class) so it animates back out on
+     scroll exactly like its siblings instead of staying pinned visible. */
+  var introCard = document.querySelector('#worksIntro .work');
+  if(introCard) works.push(introCard);
   if(!works.length) return;
 
   var LERP = .1;     /* lower = slower to catch up to the scroll target */
@@ -917,6 +947,10 @@ a{color:inherit;text-decoration:none;}
   function tick(){
     var settled = true;
     works.forEach(function(el, i){
+      /* the intro card isn't handed off yet — leave it alone, the z-space
+         transition still owns it (via the CSS transition + is-in class),
+         and don't let that count against settling either. */
+      if(el === introCard && !el.classList.contains('is-scrubbed')) return;
       var target = targetFor(el);
       var next = current[i] + (target - current[i]) * LERP;
       if(Math.abs(target - next) > EPS) settled = false;
@@ -929,6 +963,15 @@ a{color:inherit;text-decoration:none;}
   function kick(){
     if(rafId == null){ rafId = window.requestAnimationFrame(tick); }
   }
+  window.__kickWorks = kick;   /* called by the z-space transition on handoff */
+  /* the intro card is always fully revealed (p=1: opacity 1, scale 1,
+     centred) the instant the CSS transition finishes and handoff happens
+     — prime its LERP "current" to match so it picks up from there instead
+     of chasing back up from 0 and visibly flashing hidden first. */
+  window.__primeIntroScrub = function(){
+    var idx = works.indexOf(introCard);
+    if(idx > -1) current[idx] = 1;
+  };
 
   window.addEventListener('scroll', kick, {passive:true});
   window.addEventListener('resize', kick);
