@@ -974,6 +974,79 @@ a{color:inherit;text-decoration:none;}
     link.addEventListener('mouseleave', clear);
   });
 })();
+
+/* smooth, weighted scroll — trackpad/mouse wheel input is captured and
+   eased toward a target instead of moving the page 1:1, so scrolling
+   gets a heavier, more deliberate feel that suits the cinematic
+   transitions elsewhere on the page. Keyboard and scrollbar-drag scroll
+   are left native (untouched, still instant/accessible), and this whole
+   thing is skipped for reduced-motion in favour of plain native scroll. */
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  function clamp(v,a,b){ return v < a ? a : (v > b ? b : v); }
+
+  var LERP    = .085;   /* lower = heavier / slower to catch up */
+  var current = window.scrollY;
+  var target  = current;
+  var rafId   = null;
+
+  function maxScroll(){
+    return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  }
+
+  /* the page sets html{scroll-behavior:smooth} for anchor-link jumps —
+     but that makes every plain scrollTo() animate on its own too, and a
+     smooth scrollTo() fired every frame fights itself and never actually
+     gets anywhere. Force 'auto' here so OUR easing is the only easing. */
+  function setScroll(y){
+    window.scrollTo({top: y, left: 0, behavior: 'auto'});
+  }
+
+  function tick(){
+    current += (target - current) * LERP;
+    if(Math.abs(target - current) < .5){
+      current = target;
+      setScroll(current);
+      rafId = null;
+      return;
+    }
+    setScroll(current);
+    rafId = window.requestAnimationFrame(tick);
+  }
+
+  function kick(){
+    if(rafId == null){ rafId = window.requestAnimationFrame(tick); }
+  }
+
+  window.addEventListener('wheel', function(e){
+    if(e.ctrlKey) return;   /* trackpad pinch-zoom — never hijack that */
+    e.preventDefault();
+
+    /* the loop only "owns" scroll position while it's actively running —
+       otherwise (after a keyboard scroll, a scrollbar drag, or a nav
+       link's native smooth-scroll) resync to wherever the page actually
+       is before applying this gesture's delta, so we never snap back to
+       a stale position. */
+    if(rafId == null){
+      current = window.scrollY;
+      target  = current;
+    }
+
+    var dy = e.deltaY;
+    if(e.deltaMode === 1) dy *= 18;                 // line mode → ~px
+    else if(e.deltaMode === 2) dy *= window.innerHeight; // page mode
+
+    /* a slight damping on top of the easing — both together are what
+       make the scroll feel slower and more deliberate, not just laggy */
+    target = clamp(target + dy * .82, 0, maxScroll());
+    kick();
+  }, {passive:false});
+
+  window.addEventListener('resize', function(){
+    target = clamp(target, 0, maxScroll());
+  });
+})();
 </script>
 </body>
 </html>
