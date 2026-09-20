@@ -163,25 +163,89 @@ a{color:inherit;text-decoration:none;}
   z-index:2;            /* hero rides over the works layer */
   height:100vh;
   overflow:hidden;
-  background:var(--black);
+  /* base surface the aura layers blend against — mix-blend-mode needs a
+     solid color underneath (not pure black) for the hues to read */
+  background-color:#100e0b;
   will-change:transform,opacity;
 }
 
-/* two overlapping ellipse glows, matching Group 249 in the frame */
-.hero::before{
-  content:"";
+/* ============================================================
+   AURORA AURA — layered nebula glow behind the hero content.
+   Six absolutely-positioned gradient layers, stacked in front of
+   .hero's own background-color and blended into it. .hero already
+   supplies the containing block (sticky = positioned) and
+   overflow:hidden the layers need.
+   Desktop values below; @media (max-width:900px) tightens the
+   blur radii to the smaller "mobile" figures.
+   ============================================================ */
+.aura-layer-1{
   position:absolute;
   inset:0;
-  background:
-    radial-gradient(48% 92% at 48% 72%,
-      rgba(45,55,175,.80) 0%, rgba(21,26,90,.38) 45%, rgba(0,0,0,0) 76%),
-    radial-gradient(45% 78% at 5% 60%,
-      rgba(52,64,196,.92) 0%, rgba(24,29,102,.46) 44%, rgba(0,0,0,0) 78%),
-    var(--black);
+  background:linear-gradient(154deg, transparent 18%, rgba(12,72,61,0.06) 29%, rgba(0,229,255,0.40) 36%, rgb(255,255,255) 42%, rgba(73,207,158,0.32) 48%, rgba(38,158,119,0.22) 55%, rgba(0,183,255,0.30) 62%, rgba(15,76,65,0.08) 68%, transparent 82%);
+  mix-blend-mode:screen;
+  filter:blur(122px);
+  transform:translateZ(0);
+  will-change:transform;
+  pointer-events:none;
+}
+.aura-layer-2{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(128deg, transparent 28%, rgba(15,82,96,0.06) 38%, rgba(0,183,255,0.35) 43%, rgb(255,255,255) 48%, rgba(68,197,185,0.22) 52%, rgba(0,229,255,0.25) 57%, rgba(25,105,112,0.10) 62%, transparent 76%);
+  mix-blend-mode:screen;
+  filter:blur(108px);
+  opacity:.9;
+  transform:translateZ(0);
+  will-change:transform;
+  pointer-events:none;
+}
+.aura-layer-3{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse 78% 20% at 51% 53%, rgba(65,183,155,0.24) 0%, rgba(30,102,91,0.10) 45%, transparent 82%);
+  mix-blend-mode:screen;
+  filter:blur(101px);
+  opacity:.9;
+  transform:translateZ(0);
+  will-change:transform;
+  pointer-events:none;
+}
+.aura-layer-4{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse 48% 9% at 52% 50%, rgba(190,255,226,0.14) 0%, rgba(91,195,163,0.06) 45%, transparent 80%);
+  mix-blend-mode:screen;
+  filter:blur(252px);
+  transform:translateZ(0);
+  will-change:transform;
+  pointer-events:none;
+}
+.aura-layer-5{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to top, rgba(1,5,13,0.90) 0%, rgba(2,7,16,0.58) 28%, rgba(3,9,20,0.20) 55%, transparent 78%);
+  mix-blend-mode:multiply;
+  filter:blur(115px);
+  opacity:.9;
+  transform:translateZ(0);
+  will-change:transform;
+  pointer-events:none;
+}
+.aura-layer-6{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse 50% 28% at 72% 18%, rgba(89,62,151,0.10) 0%, rgba(57,44,100,0.04) 45%, transparent 82%);
+  mix-blend-mode:screen;
+  filter:blur(198px);
+  opacity:.7;
+  transform:translateZ(0);
+  will-change:transform;
+  pointer-events:none;
 }
 
 .hero-inner{
   position:relative;
+  z-index:1;            /* keep the wordmark above the aura layers */
   height:100%;
   max-width:var(--canvas);
   margin:0 auto;
@@ -409,6 +473,12 @@ a{color:inherit;text-decoration:none;}
   .footer-col,.footer-col:last-child{width:auto;}
   .footer-col li{font-size:17px;line-height:30px;}
   .footer-copy{font-size:16px;}
+  .aura-layer-1{filter:blur(85px);}
+  .aura-layer-2{filter:blur(75px);}
+  .aura-layer-3{filter:blur(70px);}
+  .aura-layer-4{filter:blur(175px);}
+  .aura-layer-5{filter:blur(80px);}
+  .aura-layer-6{filter:blur(138px);}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -441,6 +511,12 @@ a{color:inherit;text-decoration:none;}
   <!-- ---------------- HERO ---------------- -->
   <div class="hero-track" id="heroTrack">
     <header class="hero" id="hero">
+      <div class="aura-layer-1"></div>
+      <div class="aura-layer-2"></div>
+      <div class="aura-layer-3"></div>
+      <div class="aura-layer-4"></div>
+      <div class="aura-layer-5"></div>
+      <div class="aura-layer-6"></div>
       <div class="hero-inner">
         <div class="hero-block" id="home">
           <h1 class="hero-name">ADAM GALANTE</h1>
