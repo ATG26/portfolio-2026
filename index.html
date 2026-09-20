@@ -334,6 +334,8 @@ a{color:inherit;text-decoration:none;}
   line-height:1.17;
   color:var(--white);
   white-space:nowrap;
+  will-change:transform,opacity;
+  backface-visibility:hidden;
 }
 .hero-sub{
   /* right-aligned under the wordmark, tucked up against its baseline */
@@ -344,6 +346,8 @@ a{color:inherit;text-decoration:none;}
   letter-spacing:-.02em;
   line-height:1.2;
   color:var(--white);
+  will-change:transform,opacity;
+  backface-visibility:hidden;
 }
 
 /* ============================================================
@@ -381,16 +385,21 @@ a{color:inherit;text-decoration:none;}
   height:104vh;
   transform:translateX(-50%);
   background:var(--white);
-  /* 2px white ring covers sub-pixel seams at the end of the travel without
-     affecting layout; the soft shadow reads as a lit plane hanging in front
-     of the dark one, and falls outside the viewport once it lands */
-  box-shadow:0 0 0 2px var(--white), 0 40px 140px rgba(0,0,0,.55);
+  /* a soft, low ring instead of a hard 2px edge — reads as a lit plane
+     easing into place rather than a rigid card snapping down */
+  box-shadow:0 0 0 1px rgba(255,255,255,.5), 0 50px 160px rgba(0,0,0,.4);
+  will-change:opacity;
   /* this panel (and its blurred shadow) only earns its keep during the
      hero-to-works transition — once the scroll settles it should be
      gone, not sitting behind the cards below as a stray gradient */
   transition:opacity .5s ease;
 }
 .works-intro.is-settled::before{opacity:0;}
+.works-heading{
+  opacity:0;
+  transform:translateY(36px);
+  will-change:transform,opacity;
+}
 .works-heading{
   margin:0 0 56px;
   font-size:clamp(28px,2.78vw,40px);
@@ -578,7 +587,7 @@ a{color:inherit;text-decoration:none;}
 
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto;}
-  .hero,.works-intro{transform:none !important;opacity:1 !important;}
+  .hero,.hero-name,.hero-sub,.works-intro,.works-heading{transform:none !important;opacity:1 !important;}
   .work-thumb img{transition:none;}
   .aura-layer-1,.aura-layer-2,.aura-layer-3,.aura-layer-4,.aura-layer-5,.aura-layer-6{animation:none;}
 }
@@ -731,7 +740,10 @@ a{color:inherit;text-decoration:none;}
 (function(){
   var track     = document.getElementById('heroTrack');
   var hero      = document.getElementById('hero');
+  var heroName  = document.querySelector('.hero-name');
+  var heroSub   = document.querySelector('.hero-sub');
   var intro     = document.getElementById('worksIntro');
+  var heading   = document.getElementById('works');
   var nav       = document.getElementById('siteNav');
   var rail      = document.getElementById('rail');
 
@@ -756,16 +768,30 @@ a{color:inherit;text-decoration:none;}
     var e     = smooth(p);
 
     if(!reduced){
-      /* HERO — travels toward the camera and dissolves, so it flies past
-         the viewer rather than shrinking into a card. */
+      /* HERO — the wordmark and subhead fly through the camera at their
+         own rates (name faster/closer, sub slower/behind) instead of the
+         whole hero panning as one flat block — that's what read as
+         "boxy". The dark backdrop itself stays put; only its content
+         travels, so it genuinely feels like flying past into the works
+         section rather than a card sliding off. */
       if(p <= 0){
-        hero.style.transform = 'none';
-        hero.style.opacity   = '1';
+        heroName.style.transform = 'none';
+        heroName.style.opacity   = '1';
+        heroSub.style.transform  = 'none';
+        heroSub.style.opacity    = '1';
+        hero.style.opacity       = '1';
       }else{
-        hero.style.transform = 'perspective(' + DEPTH + 'px) translateZ(' + mix(0,520,e).toFixed(1) + 'px)';
-        /* stays opaque the whole way — the works panel is what covers it.
-           The late fade is just insurance against a seam on odd ratios. */
-        hero.style.opacity   = mix(1,0,clamp((p - .85) / .15,0,1)).toFixed(3);
+        var nameE = smooth(clamp(p / .8, 0, 1));
+        var subE  = smooth(clamp((p - .08) / .8, 0, 1));
+        heroName.style.transform =
+          'perspective(' + DEPTH + 'px) translateZ(' + mix(0,950,nameE).toFixed(1) + 'px)';
+        heroName.style.opacity   = mix(1,0,clamp((p - .42) / .38,0,1)).toFixed(3);
+        heroSub.style.transform =
+          'perspective(' + DEPTH + 'px) translateZ(' + mix(0,600,subE).toFixed(1) + 'px)';
+        heroSub.style.opacity    = mix(1,0,clamp((p - .52) / .38,0,1)).toFixed(3);
+        /* backdrop fade — insurance against a seam on odd ratios, same
+           as before, just no longer riding a translateZ dolly of its own */
+        hero.style.opacity       = mix(1,0,clamp((p - .85) / .15,0,1)).toFixed(3);
       }
       hero.style.pointerEvents = p > .5 ? 'none' : '';
 
@@ -774,16 +800,37 @@ a{color:inherit;text-decoration:none;}
          translateY sits OUTSIDE perspective() so it stays a flat, exact
          screen-space offset. */
       if(p >= 1){
-        intro.style.transform = 'none';   /* snap to clean pixels when settled */
-        intro.style.opacity   = '1';
+        intro.style.transform  = 'none';   /* snap to clean pixels when settled */
+        intro.style.opacity    = '1';
         intro.classList.add('is-settled');   /* fades out the reveal-panel shadow */
+        heading.style.transform = 'none';
+        heading.style.opacity   = '1';
       }else{
         intro.classList.remove('is-settled');
         var hold = -(1 - p) * room;
+        /* an explicit scale carries the "arrives from a distant point"
+           read — perspective's own translateZ scaling tops out too
+           gently on its own to read as small-and-far, and fighting that
+           math made the panel snap in already large. Scale gives direct
+           control: it starts as a small card and grows to fill the
+           frame, translateZ just adds a touch of depth-fog on top. */
         intro.style.transform =
           'translateY(' + hold.toFixed(1) + 'px) ' +
-          'perspective(' + DEPTH + 'px) translateZ(' + mix(-900,0,e).toFixed(1) + 'px)';
-        intro.style.opacity   = smooth(clamp(p / .45,0,1)).toFixed(3);
+          'perspective(' + DEPTH + 'px) translateZ(' + mix(-260,0,e).toFixed(1) + 'px) ' +
+          'scale(' + mix(.16,1,e).toFixed(3) + ')';
+        /* opaque almost immediately — this is a solid plane arriving from
+           depth, not a cross-fade. A slow opacity ramp here is what made
+           the hero ghost through it; the panel should read as solid the
+           instant it appears small and far away, then simply grow. */
+        intro.style.opacity   = clamp(p / .04,0,1).toFixed(3);
+
+        /* heading arrives on its own, a beat after the panel itself, so
+           it reads as content settling in rather than being glued to
+           the plane — the same "comes on as you scroll" feel the cards
+           below already have. */
+        var headE = smooth(clamp((p - .55) / .4, 0, 1));
+        heading.style.opacity   = headE.toFixed(3);
+        heading.style.transform = 'translateY(' + mix(36,0,headE).toFixed(1) + 'px)';
       }
     }
 
