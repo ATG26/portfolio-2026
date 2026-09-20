@@ -60,10 +60,12 @@ html{
   scroll-behavior:smooth;
   overflow-x:clip;    /* clip, not hidden — hidden would make <html> a scroll
                          container and break the sticky hero */
-  /* a light touch, not a hard grab — proximity only nudges the rest
-     position when a scroll already lands close to a snap point, it
-     never fights or truncates a scroll in progress. The hero's own
-     sticky flythrough has no snap point, so it's untouched. */
+  /* only the footer lands with a light snap now — testing the work
+     cards showed proximity's "closeness" threshold is actually quite
+     wide in practice (committing fully from ~300px away, most of the
+     gap between cards), so it fought the scroll between cards instead
+     of letting it flow freely. The hero's own sticky flythrough has no
+     snap point either way, so it was always untouched. */
   scroll-snap-type:y proximity;
 }
 body{
@@ -405,7 +407,6 @@ a{color:inherit;text-decoration:none;}
   width:var(--card-w);
   margin-bottom:var(--card-gap);
 }
-.works > .work{scroll-snap-align:center;}
 .works > .work:last-child{margin-bottom:0;}
 .work--right{margin-left:var(--card-offset);}
 
@@ -420,15 +421,11 @@ a{color:inherit;text-decoration:none;}
    either direction. No CSS transition — JS already updates in
    step with the scroll, and a transition here would just add lag.
 
-   This lives on an INNER .work-reveal wrapper, not on .work itself —
-   .work (which carries scroll-snap-align) stays a stable, untransformed
-   layout box. Scroll-snap needs to read a fixed rest position; if the
-   translate/scale animation lived on the same element being snapped, the
-   snap could fire mid-animation (before the card finished scaling/
-   translating to its resting state) and then go stale once the reveal
-   kept easing afterward, landing off-centre. Splitting them into two
-   elements means the browser always snaps to where the card actually
-   sits at rest. */
+   This lives on an INNER .work-reveal wrapper, not on .work itself, so
+   the animated opacity/translate/scale/filter never sits on the same
+   element as any layout-affecting state (kept as a stable, untransformed
+   box) — .work no longer snaps (see below), but this split is still the
+   right call for keeping the reveal's own geometry calculations stable. */
 .work-reveal{
   opacity:0;
   translate:-425px 225px;
@@ -938,9 +935,8 @@ a{color:inherit;text-decoration:none;}
   var EPS  = .0015;
   var current = works.map(function(){ return 0; });
   /* the animated opacity/translate/scale/filter live on an inner
-     .work-reveal wrapper, not on .work itself — .work stays a stable,
-     untransformed box so scroll-snap-align (on .work) always reads its
-     true resting position, instead of racing the reveal animation. */
+     .work-reveal wrapper, not on .work itself — keeps .work's own
+     geometry stable for targetFor()'s calculations below. */
   var reveals = works.map(function(el){ return el.querySelector('.work-reveal'); });
   var rafId = null;
 
