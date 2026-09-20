@@ -369,8 +369,12 @@ a{color:inherit;text-decoration:none;}
   will-change:transform,opacity;
   /* the card should land centred in the viewport, not pinned to the top
      under the nav — a full-height flex box centres it regardless of
-     screen size, instead of hand-tuning a fixed offset */
+     screen size, instead of hand-tuning a fixed offset. The top/bottom
+     padding keeps it from crowding the fixed nav (which is always
+     visible now) or the very bottom edge of the screen. */
   min-height:100vh;
+  box-sizing:border-box;
+  padding:140px 0 100px;
   display:flex;
   flex-direction:column;
   justify-content:center;
