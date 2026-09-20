@@ -18,10 +18,19 @@
 
 /* ============================================================
    Adam Galante — Portfolio V2 — PROJECT PAGES
-   Shares the homepage's tokens, nav and footer styling, but
-   deliberately skips the scroll-scrubbed reveal/z-space machinery
-   in index.html — a single case study page doesn't need it, just
-   a calm fade-in on load.
+
+   Rebuilt from two Figma case-study frames: the full-bleed
+   image-into-dark-title-band "opening" from the "Five Guys Case
+   Study" frame, and the numbered, alternating light/dark section
+   rhythm ("01 — THE CHALLENGE", hairlines, two-column problem /
+   response, a closing "next project" link) from the
+   "Five Guys — Portfolio Case Study / Desktop" frame. Typography
+   and color stay on the homepage's own tokens (--ink/--white/
+   --footer-base, Roboto Condensed) rather than the Figma file's,
+   so these read as part of the same site instead of a pasted-in
+   template. Reserves the homepage's italic wordmark treatment for
+   the homepage alone — these use the same bold condensed upright
+   style the rest of the site already uses for work-title/work-year.
    ============================================================ */
 
 :root{
@@ -48,9 +57,9 @@ img{display:block;max-width:100%;}
 a{color:inherit;text-decoration:none;}
 
 /* ============================================================
-   NAV — same fixed nav as the homepage, but always dark text:
-   project pages are white top-to-bottom, so there's no light/dark
-   backdrop to invert against.
+   NAV — same fixed nav as the homepage. A frosted backdrop keeps
+   it legible over the full-bleed opening image, whatever's in it,
+   without needing to invert per-page.
    ============================================================ */
 .site-nav{
   position:fixed;
@@ -58,7 +67,10 @@ a{color:inherit;text-decoration:none;}
   z-index:120;
   display:flex;
   justify-content:flex-end;
-  padding:33px var(--gutter) 0;
+  padding:33px var(--gutter) 22px;
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
 }
 .site-nav ul{
   display:flex;
@@ -80,126 +92,175 @@ a{color:inherit;text-decoration:none;}
 .site-nav a:hover{opacity:.65;}
 
 /* ============================================================
-   PROJECT — the case study layout itself
+   OPENING — full-bleed hero image straight into a dark title +
+   facts band, no gutter, no gap between them. Borrowed from the
+   "Five Guys Case Study" frame's opening treatment.
    ============================================================ */
-.project{
-  max-width:var(--canvas);
-  margin:0 auto;
-  padding:140px var(--gutter) 0;
-}
-.project-inner{max-width:var(--content);margin:0 auto;}
-
-.project-back{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  font-size:16px;
-  font-weight:500;
-  margin-bottom:56px;
-  opacity:.7;
-  transition:opacity .2s ease;
-}
-.project-back:hover{opacity:1;}
-
-.project-head{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:24px;
-  margin-bottom:28px;
-}
-.project-title{
-  margin:0;
-  font-size:clamp(32px,4.2vw,60px);
-  font-weight:500;
-  letter-spacing:-.03em;
-  line-height:1.08;
-}
-.project-year{
-  flex:none;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-width:72px;
-  height:34px;
-  padding:0 18px;
-  border-radius:2px;
-  background:var(--black);
-  color:var(--white);
-  font-size:20px;
-  font-weight:500;
-  letter-spacing:-.03em;
-  line-height:1;
-}
-
-.project-hero{
+.project-open-media{
   position:relative;
-  aspect-ratio:802 / 452;
+  width:100vw;
+  margin-left:calc(-50vw + 50%);
+  aspect-ratio:1604 / 902;
   overflow:hidden;
   background:#d8d8d8;
-  margin-bottom:64px;
 }
-.project-hero img{width:100%;height:100%;object-fit:cover;}
+.project-open-media img{width:100%;height:100%;object-fit:cover;}
 
-.project-body{
-  display:flex;
-  gap:80px;
-  padding-bottom:140px;
+.project-open-band{
+  width:100vw;
+  margin-left:calc(-50vw + 50%);
+  background:var(--footer-base);
+  color:var(--white);
+  padding:56px var(--gutter) 48px;
 }
-.project-col--main{flex:1 1 auto;min-width:0;}
-.project-col--main h2{
-  margin:0 0 18px;
-  font-size:clamp(20px,1.8vw,26px);
+.project-open-inner{
+  max-width:var(--content);
+  margin:0 auto;
+}
+.project-title{
+  margin:0 0 40px;
+  font-size:clamp(40px,6.4vw,92px);
   font-weight:500;
+  text-transform:uppercase;
   letter-spacing:-.02em;
+  line-height:1.02;
 }
-.project-col--main p{
-  margin:0;
-  font-size:clamp(16px,1.25vw,19px);
-  font-weight:300;
-  line-height:1.6;
-  max-width:62ch;
-}
-.project-col--side{
-  flex:none;
-  width:260px;
-  display:flex;
-  flex-direction:column;
-  gap:32px;
+.project-facts{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:24px 32px;
+  padding-top:28px;
+  border-top:1px solid rgba(255,255,255,.18);
 }
 .project-fact h3{
   margin:0 0 8px;
-  font-size:14px;
+  font-size:13px;
   font-weight:500;
   text-transform:uppercase;
-  letter-spacing:.04em;
+  letter-spacing:.06em;
   opacity:.55;
 }
 .project-fact p{
   margin:0;
   font-size:17px;
   font-weight:400;
-  line-height:1.45;
+  line-height:1.4;
 }
 
-/* calm fade-up on load, not the homepage's scroll-scrubbed system —
-   a single static page doesn't need scroll-driven motion */
-.project-back,.project-head,.project-hero,.project-body{
-  opacity:0;
-  animation:projectIn .7s cubic-bezier(.16,.84,.44,1) forwards;
+/* ============================================================
+   SECTIONS — numbered label, big headline, hairline rule,
+   alternating white / dark backgrounds for the same editorial
+   rhythm the site already has (dark hero, white cards, dark
+   footer) rather than one flat page.
+   ============================================================ */
+.project-section{
+  padding:96px var(--gutter);
 }
-.project-back{animation-delay:.05s;}
-.project-head{animation-delay:.12s;}
-.project-hero{animation-delay:.18s;}
-.project-body{animation-delay:.26s;}
-@keyframes projectIn{
-  from{opacity:0;transform:translateY(18px);}
-  to{opacity:1;transform:translateY(0);}
+.project-section--dark{
+  background:var(--footer-base);
+  color:var(--white);
 }
-@media (prefers-reduced-motion:reduce){
-  .project-back,.project-head,.project-hero,.project-body{
-    animation:none;opacity:1;
-  }
+.project-section-inner{
+  max-width:var(--content);
+  margin:0 auto;
+}
+.project-label{
+  display:block;
+  margin-bottom:24px;
+  font-size:13px;
+  font-weight:500;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  opacity:.55;
+}
+.project-heading{
+  margin:0 0 48px;
+  font-size:clamp(28px,3.4vw,48px);
+  font-weight:500;
+  text-transform:uppercase;
+  letter-spacing:-.01em;
+  line-height:1.12;
+  max-width:20ch;
+}
+.project-lede{
+  margin:0 0 48px;
+  font-size:clamp(16px,1.3vw,19px);
+  font-weight:300;
+  line-height:1.6;
+  max-width:62ch;
+}
+.project-twocol{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:64px;
+}
+.project-twocol h3{
+  margin:0 0 16px;
+  font-size:clamp(19px,1.6vw,24px);
+  font-weight:500;
+  letter-spacing:-.01em;
+  line-height:1.25;
+}
+.project-twocol p{
+  margin:0;
+  font-size:16px;
+  font-weight:300;
+  line-height:1.65;
+}
+
+.project-media{
+  position:relative;
+  aspect-ratio:1604 / 902;
+  overflow:hidden;
+  background:#d8d8d8;
+  margin-bottom:48px;
+}
+.project-media img{width:100%;height:100%;object-fit:cover;}
+
+.project-back{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:15px;
+  font-weight:500;
+  opacity:.6;
+  transition:opacity .2s ease;
+}
+.project-back:hover{opacity:1;}
+
+/* ---- next project ---- */
+.project-next{
+  display:block;
+  padding:96px var(--gutter);
+  background:var(--footer-base);
+  color:var(--white);
+  border-top:1px solid rgba(255,255,255,.14);
+  transition:opacity .2s ease;
+}
+.project-next:hover{opacity:.85;}
+.project-next-inner{
+  max-width:var(--content);
+  margin:0 auto;
+}
+.project-next-label{
+  display:block;
+  margin-bottom:20px;
+  font-size:13px;
+  font-weight:500;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  opacity:.55;
+}
+.project-next-title{
+  margin:0;
+  font-size:clamp(40px,7vw,100px);
+  font-weight:500;
+  text-transform:uppercase;
+  letter-spacing:-.02em;
+  line-height:1;
+}
+.project-next-title::after{
+  content:" \2197";
 }
 
 /* ============================================================
@@ -264,13 +325,31 @@ a{color:inherit;text-decoration:none;}
   line-height:1.15;
 }
 
+/* calm fade-up on load — a single static page doesn't need the
+   homepage's scroll-scrubbed system, just a quiet entrance */
+.project-open-media,.project-open-band{
+  opacity:0;
+  animation:projectIn .7s cubic-bezier(.16,.84,.44,1) forwards;
+}
+.project-open-band{animation-delay:.12s;}
+@keyframes projectIn{
+  from{opacity:0;transform:translateY(18px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@media (prefers-reduced-motion:reduce){
+  .project-open-media,.project-open-band{animation:none;opacity:1;}
+}
+
 @media (max-width:900px){
-  .project{padding-top:110px;}
-  .project-body{flex-direction:column;gap:36px;padding-bottom:80px;}
-  .project-col--side{width:auto;flex-direction:row;flex-wrap:wrap;gap:24px 40px;}
-  .site-nav{padding:20px 16px 0;}
+  .site-nav{padding:20px 16px 14px;}
   .site-nav ul{gap:20px;}
   .site-nav a{font-size:12px;padding-bottom:4px;}
+  .project-open-band{padding:36px 16px 32px;}
+  .project-title{margin-bottom:28px;}
+  .project-facts{grid-template-columns:1fr 1fr;gap:22px 20px;}
+  .project-section{padding:64px 16px;}
+  .project-twocol{grid-template-columns:1fr;gap:36px;}
+  .project-next{padding:64px 16px;}
   .footer-inner{padding:28px 20px 24px;}
   .footer-cols{flex-wrap:wrap;gap:32px;margin-bottom:36px;}
   .footer-col,.footer-col:last-child{width:auto;}
