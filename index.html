@@ -153,18 +153,18 @@ a{color:inherit;text-decoration:none;}
   gap:19px;
   transition:opacity .3s ease;
 }
-.rail button{
+.rail-link{
   width:40px;height:40px;
-  padding:0;border:none;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:4px;
   background:var(--rail);
+  color:var(--white);
   opacity:.75;
-  cursor:pointer;
-  transition:opacity .3s ease, background .3s ease, transform .3s ease;
+  transition:opacity .3s ease, background .3s ease, transform .3s ease, color .3s ease;
 }
-.rail button:hover{opacity:1;}
-.rail button.active{opacity:1;background:var(--white);transform:scale(1.04);}
-.rail.on-light button{background:#d8d8d8;}
-.rail.on-light button.active{background:var(--ink);}
+.rail-link svg{width:20px;height:20px;display:block;fill:currentColor;}
+.rail-link:hover{opacity:1;transform:scale(1.04);}
+.rail.on-light .rail-link{background:#d8d8d8;color:var(--ink);}
 
 /* ============================================================
    Z-SPACE STAGE
@@ -556,11 +556,19 @@ a{color:inherit;text-decoration:none;}
   </ul>
 </nav>
 
-<div class="rail" id="rail" aria-hidden="true">
-  <button type="button" data-target="#home" class="active"></button>
-  <button type="button" data-target="#works"></button>
-  <button type="button" data-target="#gallery"></button>
-  <button type="button" data-target="#contact"></button>
+<div class="rail" id="rail">
+  <a class="rail-link" href="#" target="_blank" rel="noopener" aria-label="LinkedIn">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.15 1.45-2.15 2.94v5.67H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 11.01-4.14 2.07 2.07 0 01-.01 4.14zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+  </a>
+  <a class="rail-link" href="#" target="_blank" rel="noopener" aria-label="Instagram">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c2.7 0 3.06.01 4.12.06 1.06.05 1.79.22 2.43.47.66.26 1.21.6 1.76 1.15.55.55.9 1.1 1.15 1.76.25.64.42 1.37.47 2.43.05 1.06.06 1.42.06 4.12s-.01 3.06-.06 4.12c-.05 1.06-.22 1.79-.47 2.43a4.9 4.9 0 01-1.15 1.76 4.9 4.9 0 01-1.76 1.15c-.64.25-1.37.42-2.43.47-1.06.05-1.42.06-4.12.06s-3.06-.01-4.12-.06c-1.06-.05-1.79-.22-2.43-.47a4.9 4.9 0 01-1.76-1.15 4.9 4.9 0 01-1.15-1.76c-.25-.64-.42-1.37-.47-2.43C2.01 15.06 2 14.7 2 12s.01-3.06.06-4.12c.05-1.06.22-1.79.47-2.43.26-.66.6-1.21 1.15-1.76a4.9 4.9 0 011.76-1.15c.64-.25 1.37-.42 2.43-.47C8.94 2.01 9.3 2 12 2zm0 1.8c-2.65 0-2.98.01-4.02.06-.87.04-1.34.18-1.65.3-.42.16-.71.36-1.02.67-.31.31-.5.6-.67 1.02-.12.31-.26.78-.3 1.65-.05 1.04-.06 1.37-.06 4.02s.01 2.98.06 4.02c.04.87.18 1.34.3 1.65.16.42.36.71.67 1.02.31.31.6.5 1.02.67.31.12.78.26 1.65.3 1.04.05 1.37.06 4.02.06s2.98-.01 4.02-.06c.87-.04 1.34-.18 1.65-.3.42-.16.71-.36 1.02-.67.31-.31.5-.6.67-1.02.12-.31.26-.78.3-1.65.05-1.04.06-1.37.06-4.02s-.01-2.98-.06-4.02c-.04-.87-.18-1.34-.3-1.65a2.73 2.73 0 00-.67-1.02 2.73 2.73 0 00-1.02-.67c-.31-.12-.78-.26-1.65-.3-1.04-.05-1.37-.06-4.02-.06zm0 3.05a5.15 5.15 0 110 10.3 5.15 5.15 0 010-10.3zm0 1.8a3.35 3.35 0 100 6.7 3.35 3.35 0 000-6.7zm5.35-1.99a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0z"/></svg>
+  </a>
+  <a class="rail-link" href="#" target="_blank" rel="noopener" aria-label="Behance">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M0 7.5h8.7c1.9 0 3.3.4 4.3 1.2.9.8 1.4 1.9 1.4 3.2 0 .8-.2 1.5-.6 2.1-.4.6-1 1.1-1.7 1.4 1 .3 1.8.8 2.3 1.6.5.7.8 1.6.8 2.6 0 1.5-.6 2.7-1.7 3.6-1.1.9-2.6 1.3-4.6 1.3H0V7.5zm3.6 6.1h4.4c.9 0 1.6-.2 2.1-.6.5-.4.7-.9.7-1.6 0-.7-.2-1.3-.7-1.6-.5-.4-1.2-.5-2.1-.5H3.6v4.3zm0 6.4h4.8c1 0 1.8-.2 2.3-.6.5-.4.8-1 .8-1.8 0-.8-.3-1.4-.8-1.8-.5-.4-1.3-.6-2.3-.6H3.6v4.8zM14.8 9.9h6.9V8.2h-6.9v1.7zM24 16.1c0-1.9-.5-3.4-1.6-4.5-1.1-1.1-2.6-1.7-4.4-1.7-1.9 0-3.5.6-4.6 1.8-1.1 1.2-1.7 2.8-1.7 4.7 0 2 .6 3.6 1.8 4.8 1.2 1.2 2.7 1.7 4.6 1.7 1.5 0 2.8-.3 3.8-1 1-.7 1.7-1.6 2-2.8h-3c-.2.4-.5.8-1 1-.4.2-.9.4-1.6.4-.9 0-1.6-.3-2.1-.8-.5-.5-.8-1.3-.9-2.2h9.6c0-.2.1-.4.1-.6v-.8zm-9.6-.9c.1-.8.4-1.4.9-1.9.5-.4 1.1-.7 1.9-.7.8 0 1.4.2 1.9.7.5.5.8 1.1.8 1.9h-5.5z"/></svg>
+  </a>
+  <a class="rail-link" href="mailto:adamtgalante@gmail.com" aria-label="Email">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5.5A1.5 1.5 0 013.5 4h17A1.5 1.5 0 0122 5.5v13a1.5 1.5 0 01-1.5 1.5h-17A1.5 1.5 0 012 18.5v-13zm1.7.3l8.3 6.3 8.3-6.3H3.7zM20.5 7.6l-8.16 6.2a.75.75 0 01-.68 0L3.5 7.6v10.9h17V7.6z"/></svg>
+  </a>
 </div>
 
 <div class="zspace">
@@ -665,10 +673,6 @@ a{color:inherit;text-decoration:none;}
   var intro     = document.getElementById('worksIntro');
   var nav       = document.getElementById('siteNav');
   var rail      = document.getElementById('rail');
-  var dots      = Array.prototype.slice.call(rail.querySelectorAll('button'));
-  var anchors   = ['#home','#works','#gallery','#contact'].map(function(s){
-                    return document.querySelector(s);
-                  });
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var queued  = false;
@@ -740,14 +744,6 @@ a{color:inherit;text-decoration:none;}
       nav.classList.remove('is-hidden');
     }
     lastY = y;
-
-    /* scrollspy */
-    var probe = window.scrollY + vh * 0.42;
-    var active = 0;
-    anchors.forEach(function(el,i){
-      if(el && el.getBoundingClientRect().top + window.scrollY <= probe) active = i;
-    });
-    dots.forEach(function(d,i){ d.classList.toggle('active', i === active); });
   }
 
   function onScroll(){
@@ -761,13 +757,6 @@ a{color:inherit;text-decoration:none;}
   window.addEventListener('resize', onScroll);
   window.addEventListener('load', onScroll);
   frame();
-
-  dots.forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var el = document.querySelector(btn.getAttribute('data-target'));
-      if(el) el.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block:'start'});
-    });
-  });
 })();
 
 /* card reveal, scroll-scrubbed — motion referenced from the "Aniref"
