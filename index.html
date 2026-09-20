@@ -839,8 +839,11 @@ a{color:inherit;text-decoration:none;}
       }
     }
 
-    /* nav + rail invert once the white section owns the screen */
-    var onLight = p > .45;
+    /* nav + rail invert only once the hero backdrop has fully faded
+       (matches hero.style.opacity hitting 0 at p=.92) — switching any
+       earlier meant dark nav text sat on the still-dark hero and the
+       nav effectively vanished mid-flythrough. */
+    var onLight = p >= .92;
     nav.classList.toggle('on-light', onLight);
     rail.classList.toggle('on-light', onLight);
 
