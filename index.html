@@ -405,7 +405,7 @@ a{color:inherit;text-decoration:none;}
   width:var(--card-w);
   margin-bottom:var(--card-gap);
 }
-.works > .work{scroll-snap-align:start;}
+.works > .work{scroll-snap-align:center;}
 .works > .work:last-child{margin-bottom:0;}
 .work--right{margin-left:var(--card-offset);}
 
@@ -419,15 +419,24 @@ a{color:inherit;text-decoration:none;}
    so a card animates back out as you scroll away from it in
    either direction. No CSS transition — JS already updates in
    step with the scroll, and a transition here would just add lag.
-   ============================================================ */
-.work{
+
+   This lives on an INNER .work-reveal wrapper, not on .work itself —
+   .work (which carries scroll-snap-align) stays a stable, untransformed
+   layout box. Scroll-snap needs to read a fixed rest position; if the
+   translate/scale animation lived on the same element being snapped, the
+   snap could fire mid-animation (before the card finished scaling/
+   translating to its resting state) and then go stale once the reveal
+   kept easing afterward, landing off-centre. Splitting them into two
+   elements means the browser always snaps to where the card actually
+   sits at rest. */
+.work-reveal{
   opacity:0;
   translate:-425px 225px;
   scale:.69;
   filter:blur(18px);
   will-change:opacity,translate,scale,filter;
 }
-.work--right{
+.work--right .work-reveal{
   translate:425px 225px;   /* mirrored x — same y/scale/opacity as the reference */
 }
 /* the Motion Reel card inside #worksIntro stays hidden through the whole
@@ -437,7 +446,7 @@ a{color:inherit;text-decoration:none;}
    script at the bottom of the page), so it eases on and back off exactly
    like its siblings instead of a separately-timed one-shot transition. */
 @media (prefers-reduced-motion:reduce){
-  .work{opacity:1;translate:none;scale:1;filter:none;}
+  .work-reveal{opacity:1;translate:none;scale:1;filter:none;}
 }
 
 .work-thumb{
@@ -669,43 +678,51 @@ a{color:inherit;text-decoration:none;}
       <h2 class="works-heading" id="works"></h2>
 
       <article class="work">
-        <div class="work-thumb">
-          <img src="assets/images/motion-reel.png" alt="Motion Reel — title card" width="1604" height="902">
-        </div>
-        <div class="work-meta">
-          <h3 class="work-title">Motion Reel</h3>
-          <span class="work-year">2026</span>
+        <div class="work-reveal">
+          <div class="work-thumb">
+            <img src="assets/images/motion-reel.png" alt="Motion Reel — title card" width="1604" height="902">
+          </div>
+          <div class="work-meta">
+            <h3 class="work-title">Motion Reel</h3>
+            <span class="work-year">2026</span>
+          </div>
         </div>
       </article>
     </div>
 
     <article class="work work--right">
-      <div class="work-thumb">
-        <img src="assets/images/true-detective.jpg" alt="True Detective title sequence" width="1604" height="902" loading="lazy">
-      </div>
-      <div class="work-meta">
-        <h3 class="work-title">True Detective Title Sequence</h3>
-        <span class="work-year">2025</span>
+      <div class="work-reveal">
+        <div class="work-thumb">
+          <img src="assets/images/true-detective.jpg" alt="True Detective title sequence" width="1604" height="902" loading="lazy">
+        </div>
+        <div class="work-meta">
+          <h3 class="work-title">True Detective Title Sequence</h3>
+          <span class="work-year">2025</span>
+        </div>
       </div>
     </article>
 
     <article class="work" id="gallery">
-      <div class="work-thumb">
-        <img src="assets/images/five-guys-kiosk.jpg" alt="Five Guys ordering kiosk interface" width="1604" height="902" loading="lazy">
-      </div>
-      <div class="work-meta">
-        <h3 class="work-title">Five Guys Kiosk</h3>
-        <span class="work-year">2026</span>
+      <div class="work-reveal">
+        <div class="work-thumb">
+          <img src="assets/images/five-guys-kiosk.jpg" alt="Five Guys ordering kiosk interface" width="1604" height="902" loading="lazy">
+        </div>
+        <div class="work-meta">
+          <h3 class="work-title">Five Guys Kiosk</h3>
+          <span class="work-year">2026</span>
+        </div>
       </div>
     </article>
 
     <article class="work work--right">
-      <div class="work-thumb">
-        <img src="assets/images/nc-drivers-license.jpg" alt="North Carolina digital driver's license app" width="1604" height="902" loading="lazy">
-      </div>
-      <div class="work-meta">
-        <h3 class="work-title">North Carolina Drivers License</h3>
-        <span class="work-year">2026</span>
+      <div class="work-reveal">
+        <div class="work-thumb">
+          <img src="assets/images/nc-drivers-license.jpg" alt="North Carolina digital driver's license app" width="1604" height="902" loading="lazy">
+        </div>
+        <div class="work-meta">
+          <h3 class="work-title">North Carolina Drivers License</h3>
+          <span class="work-year">2026</span>
+        </div>
       </div>
     </article>
 
@@ -839,12 +856,18 @@ a{color:inherit;text-decoration:none;}
            the transition plays the same reveal again. */
         introCard.classList.remove('is-scrubbed');
         if(window.__resetIntroScrub) window.__resetIntroScrub();
-        /* clear any inline styles the scroll-scrubbed system left behind so
-           the base hidden .work styles take back over cleanly instead of
-           fighting stale inline values, and it replays cleanly next time. */
-        introCard.style.opacity = '';
-        introCard.style.translate = '';
-        introCard.style.scale = '';
+        /* clear any inline styles the scroll-scrubbed system left behind
+           (on the inner .work-reveal, where apply() actually writes) so
+           the base hidden .work-reveal styles take back over cleanly
+           instead of fighting stale inline values, and it replays
+           cleanly next time. */
+        var introReveal = introCard.querySelector('.work-reveal');
+        if(introReveal){
+          introReveal.style.opacity = '';
+          introReveal.style.translate = '';
+          introReveal.style.scale = '';
+          introReveal.style.filter = '';
+        }
 
         var headE = smooth(clamp((p - .38) / .45, 0, 1));
         heading.style.opacity   = headE.toFixed(3);
@@ -914,6 +937,11 @@ a{color:inherit;text-decoration:none;}
   var LERP = .1;     /* lower = slower to catch up to the scroll target */
   var EPS  = .0015;
   var current = works.map(function(){ return 0; });
+  /* the animated opacity/translate/scale/filter live on an inner
+     .work-reveal wrapper, not on .work itself — .work stays a stable,
+     untransformed box so scroll-snap-align (on .work) always reads its
+     true resting position, instead of racing the reveal animation. */
+  var reveals = works.map(function(el){ return el.querySelector('.work-reveal'); });
   var rafId = null;
 
   function clamp(v,a,b){ return v < a ? a : (v > b ? b : v); }
@@ -949,7 +977,7 @@ a{color:inherit;text-decoration:none;}
       var next = current[i] + (target - current[i]) * LERP;
       if(Math.abs(target - next) > EPS) settled = false;
       current[i] = next;
-      apply(el, next, el.classList.contains('work--right'));
+      apply(reveals[i], next, el.classList.contains('work--right'));
     });
     rafId = settled ? null : window.requestAnimationFrame(tick);
   }
