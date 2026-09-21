@@ -1094,7 +1094,7 @@ a{color:inherit;text-decoration:none;}
   if(introCard) works.push(introCard);
   if(!works.length) return;
 
-  var LERP = .1;     /* lower = slower to catch up to the scroll target */
+  var LERP = .06;    /* lower = slower to catch up to the scroll target */
   var EPS  = .0015;
   var current = works.map(function(){ return 0; });
   /* the animated opacity/translate/scale/filter live on an inner
