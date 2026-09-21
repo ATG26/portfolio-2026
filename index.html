@@ -403,6 +403,14 @@ a{color:inherit;text-decoration:none;}
   will-change:opacity,filter,translate;
   backface-visibility:hidden;
 }
+/* per-letter cursor blur — kept on an inner span so it never fights the
+   word-level entrance animation's own filter (see the script at the
+   bottom of the page for the proximity math) */
+.letter{
+  display:inline-block;
+  will-change:filter;
+  transition:filter .06s ease-out;
+}
 .hero-name-adam{
   animation:heroAdamOpacity 2s linear forwards, heroAdamBlur 2s linear forwards, heroAdamTranslate 2s linear forwards;
 }
@@ -814,7 +822,7 @@ a{color:inherit;text-decoration:none;}
       <div class="hero-curtain" aria-hidden="true"></div>
       <div class="hero-inner">
         <div class="hero-block" id="home">
-          <h1 class="hero-name"><span class="hero-name-adam">ADAM</span> <span class="hero-name-galante">GALANTE</span></h1>
+          <h1 class="hero-name" aria-label="ADAM GALANTE"><span class="hero-name-adam" aria-hidden="true"><span class="letter">A</span><span class="letter">D</span><span class="letter">A</span><span class="letter">M</span></span> <span class="hero-name-galante" aria-hidden="true"><span class="letter">G</span><span class="letter">A</span><span class="letter">L</span><span class="letter">A</span><span class="letter">N</span><span class="letter">T</span><span class="letter">E</span></span></h1>
           <p class="hero-sub">Buffalo, New York — Multimedia Designer</p>
         </div>
       </div>
@@ -1182,6 +1190,42 @@ a{color:inherit;text-decoration:none;}
     });
     link.addEventListener('mouseleave', clear);
   });
+})();
+
+/* wordmark letter blur — each letter in "ADAM GALANTE" gaussian-blurs by
+   how close the cursor sits to it, sharp again as it moves away. Fine
+   pointers only, and skipped under reduced-motion since it's a
+   continuous filter change tied to every mouse move. */
+(function(){
+  if(!window.matchMedia('(pointer:fine)').matches) return;
+  if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  var letters = Array.prototype.slice.call(document.querySelectorAll('.hero-name .letter'));
+  if(!letters.length) return;
+
+  var MAX_BLUR = 14;   // px, directly under the cursor
+  var RADIUS   = 110;  // px falloff — sharp again past this distance
+
+  var mouseX = -9999, mouseY = -9999, rafId = null;
+
+  function apply(){
+    rafId = null;
+    letters.forEach(function(el){
+      var r = el.getBoundingClientRect();
+      var cx = r.left + r.width / 2;
+      var cy = r.top + r.height / 2;
+      var dx = mouseX - cx, dy = mouseY - cy;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+      var t = Math.max(0, 1 - dist / RADIUS);
+      var blur = MAX_BLUR * t * t;   // quadratic falloff — a soft gaussian-like curve
+      el.style.filter = blur > 0.05 ? 'blur(' + blur.toFixed(2) + 'px)' : '';
+    });
+  }
+
+  window.addEventListener('mousemove', function(e){
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    if(rafId == null) rafId = window.requestAnimationFrame(apply);
+  }, {passive:true});
 })();
 
 </script>
