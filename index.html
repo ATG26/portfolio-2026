@@ -356,6 +356,141 @@ a{color:inherit;text-decoration:none;}
 }
 
 /* ============================================================
+   INTRO — referenced from the "Aniref" frame (Capstone I, page WIP,
+   node 2460:2070): a one-shot, 2s entrance that plays once on load.
+   Every element shares the same 2s timeline (no per-element delay —
+   each keyframe track holds at its start value until its own cue
+   point, then eases in), exactly mirroring the frame's cohort of
+   staggered opacity/blur/translate/scale tracks. Runs automatically
+   on paint; no JS trigger needed.
+   ============================================================ */
+.hero-curtain{
+  position:absolute;
+  inset:0;
+  background:#000;
+  pointer-events:none;
+  opacity:1;
+  filter:blur(0px);
+  animation:heroCurtainOpacity 2s linear forwards, heroCurtainBlur 2s linear forwards;
+}
+@keyframes heroCurtainOpacity{
+  0%{animation-timing-function:cubic-bezier(1,-.003,.934,1.01);opacity:1;}
+  50.05%{opacity:0;}
+  100%{opacity:0;}
+}
+@keyframes heroCurtainBlur{
+  0%{animation-timing-function:cubic-bezier(.5,0,.5,1);filter:blur(0px);}
+  50.05%{filter:blur(100px);}
+  100%{filter:blur(100px);}
+}
+
+.hero-name-adam,.hero-name-galante{
+  display:inline-block;
+  opacity:0;
+  filter:blur(100px);
+  translate:0 172px;
+  will-change:opacity,filter,translate;
+  backface-visibility:hidden;
+}
+.hero-name-adam{
+  animation:heroAdamOpacity 2s linear forwards, heroAdamBlur 2s linear forwards, heroAdamTranslate 2s linear forwards;
+}
+@keyframes heroAdamOpacity{
+  0%{opacity:0;}
+  6.764%{animation-timing-function:cubic-bezier(.838,-.01,.818,1.001);opacity:0;}
+  31.864%{opacity:1;}
+  100%{opacity:1;}
+}
+@keyframes heroAdamBlur{
+  0%{filter:blur(100px);}
+  6.764%{animation-timing-function:cubic-bezier(.44,.008,.381,1.007);filter:blur(100px);}
+  31.814%{filter:blur(0px);}
+  100%{filter:blur(0px);}
+}
+@keyframes heroAdamTranslate{
+  0%{translate:0 172px;}
+  6.764%{animation-timing-function:cubic-bezier(.039,-.011,0,1.007);translate:0 172px;}
+  31.814%{translate:0 0px;}
+  100%{translate:0 0px;}
+}
+.hero-name-galante{
+  animation:heroGalanteOpacity 2s linear forwards, heroGalanteBlur 2s linear forwards, heroGalanteTranslate 2s linear forwards;
+}
+@keyframes heroGalanteOpacity{
+  0%{opacity:0;}
+  14.955%{animation-timing-function:cubic-bezier(.911,.007,.889,1.004);opacity:0;}
+  40.055%{opacity:1;}
+  100%{opacity:1;}
+}
+@keyframes heroGalanteBlur{
+  0%{filter:blur(100px);}
+  14.955%{animation-timing-function:ease-in-out;filter:blur(100px);}
+  40.055%{filter:blur(0px);}
+  100%{filter:blur(0px);}
+}
+@keyframes heroGalanteTranslate{
+  0%{translate:0 172px;}
+  14.955%{animation-timing-function:cubic-bezier(.072,-.004,0,1.015);translate:0 172px;}
+  40.005%{translate:0 0px;}
+  100%{translate:0 0px;}
+}
+
+.hero-sub{
+  opacity:0;
+  filter:blur(100px);
+  animation:heroSubOpacity 2s linear forwards, heroSubBlur 2s linear forwards;
+}
+@keyframes heroSubOpacity{
+  0%{opacity:0;}
+  34.8%{animation-timing-function:cubic-bezier(.969,-.01,.781,.994);opacity:0;}
+  59.9%{opacity:1;}
+  100%{opacity:1;}
+}
+@keyframes heroSubBlur{
+  0%{filter:blur(100px);}
+  34.8%{animation-timing-function:cubic-bezier(.963,-.005,.5,1);filter:blur(100px);}
+  59.85%{filter:blur(0px);}
+  100%{filter:blur(0px);}
+}
+
+.site-nav{
+  opacity:0;
+  translate:0 -81px;
+  animation:heroNavOpacity 2s linear forwards, heroNavTranslate 2s linear forwards;
+}
+@keyframes heroNavOpacity{
+  0%{opacity:0;}
+  49.9%{animation-timing-function:cubic-bezier(.851,-.001,.851,.996);opacity:0;}
+  74.95%{opacity:1;}
+  100%{opacity:1;}
+}
+@keyframes heroNavTranslate{
+  0%{translate:0 -81px;}
+  49.9%{animation-timing-function:cubic-bezier(0,0,0,1.011);translate:0 -81px;}
+  75%{translate:0 0;}
+  100%{translate:0 0;}
+}
+
+.rail{
+  opacity:0;
+  scale:.87;
+  transform-origin:center;
+  animation:heroRailOpacity 2s linear forwards, heroRailScale 2s linear forwards;
+}
+@keyframes heroRailOpacity{
+  0%{opacity:0;}
+  59.9%{animation-timing-function:cubic-bezier(.851,-.001,.851,.996);opacity:0;}
+  84.95%{opacity:1;}
+  100%{opacity:1;}
+}
+@keyframes heroRailScale{
+  0%{scale:.87;}
+  59.95%{animation-timing-function:cubic-bezier(.223,-.002,.015,1.007);scale:.87;}
+  85%{scale:1;}
+  100%{scale:1;}
+}
+
+/* ============================================================
    WORKS
    ============================================================ */
 .works{
@@ -606,6 +741,11 @@ a{color:inherit;text-decoration:none;}
   .hero-block{opacity:1 !important;filter:none !important;}
   .work-thumb img{transition:none;}
   .aura-layer-1,.aura-layer-2,.aura-layer-3,.aura-layer-4,.aura-layer-5,.aura-layer-6{animation:none;}
+  .hero-curtain{display:none;}
+  .hero-name-adam,.hero-name-galante{animation:none;opacity:1;filter:none;translate:none;}
+  .hero-sub{animation:none;opacity:1;filter:none;}
+  .site-nav{animation:none;opacity:1;translate:none;}
+  .rail{animation:none;opacity:1;scale:1;}
 }
 </style>
 </head>
@@ -668,9 +808,10 @@ a{color:inherit;text-decoration:none;}
       <div class="aura-layer-4"></div>
       <div class="aura-layer-5"></div>
       <div class="aura-layer-6"></div>
+      <div class="hero-curtain" aria-hidden="true"></div>
       <div class="hero-inner">
         <div class="hero-block" id="home">
-          <h1 class="hero-name">ADAM GALANTE</h1>
+          <h1 class="hero-name"><span class="hero-name-adam">ADAM</span> <span class="hero-name-galante">GALANTE</span></h1>
           <p class="hero-sub">Buffalo, New York — Multimedia Designer</p>
         </div>
       </div>
