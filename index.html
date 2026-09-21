@@ -1205,10 +1205,10 @@ a{color:inherit;text-decoration:none;}
   var letters = Array.prototype.slice.call(document.querySelectorAll('.hero-name .letter'));
   if(!letters.length) return;
 
-  var MAX_BLUR = 16;   // px, directly under the cursor
-  var RADIUS   = 120;  // px falloff — sharp again past this distance
+  var MAX_BLUR = 24;   // px, directly under the cursor
+  var RADIUS   = 140;  // px falloff — sharp again past this distance
   var ATTACK   = 0.32; // how fast a letter blurs in as the cursor nears
-  var DECAY    = 0.05; // how slowly it lingers back to sharp — the trail
+  var DECAY    = 0.022; // how slowly it lingers back to sharp — the trail
 
   var mouseX = -9999, mouseY = -9999;
   var state = letters.map(function(){ return 0; });
