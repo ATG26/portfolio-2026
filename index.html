@@ -923,6 +923,23 @@ a{color:inherit;text-decoration:none;}
 </footer>
 
 <script>
+/* randomize the aurora — each of the 6 layers (in both the hero and
+   the footer, which reuse the same classes/keyframes) gets a random
+   negative animation-delay so they start mid-loop at a different point
+   every page load, instead of always breathing through the exact same
+   cycle in the exact same phase relationship. Skipped under
+   reduced-motion, where the aura animation is disabled entirely. */
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var durations = {1:11, 2:13, 3:10, 4:15, 5:12, 6:14};
+  Object.keys(durations).forEach(function(n){
+    var dur = durations[n];
+    document.querySelectorAll('.aura-layer-' + n).forEach(function(el){
+      el.style.animationDelay = (-(Math.random() * dur)).toFixed(2) + 's';
+    });
+  });
+})();
+
 (function(){
   var track     = document.getElementById('heroTrack');
   var hero      = document.getElementById('hero');
