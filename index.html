@@ -1078,6 +1078,20 @@ a{color:inherit;text-decoration:none;}
     }
   }
 
+  /* the rail's one-shot entrance animation (heroRailOpacity/Scale, see
+     its CSS) holds its final opacity via fill-mode:forwards — same as
+     any CSS animation, that keeps overriding this script's own
+     rail.style.opacity every frame even after the animation is long
+     done, since a completed CSS animation still outranks an inline
+     style. Clearing it off the element once it finishes hands opacity
+     back to this script, which is what actually retires the rail as
+     the works section lands. */
+  rail.addEventListener('animationend', function once(e){
+    if(e.target !== rail) return;
+    rail.style.animation = 'none';
+    rail.removeEventListener('animationend', once);
+  });
+
   window.addEventListener('scroll', onScroll, {passive:true});
   window.addEventListener('resize', onScroll);
   window.addEventListener('load', onScroll);
