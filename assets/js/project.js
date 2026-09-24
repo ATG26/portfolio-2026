@@ -23,5 +23,15 @@
     });
   }, {threshold:.15, rootMargin:'0px 0px -8% 0px'});
 
-  items.forEach(function(el){ io.observe(el); });
+  // Wait two animation frames before observing so the browser has
+  // definitely painted the hidden (.reveal) state at least once —
+  // otherwise anything already in the viewport at load (the page
+  // title, the first section) gets "is-visible" added on the very
+  // first callback with no prior paint to transition *from*, so it
+  // just appears instantly instead of blurring/fading/sliding in.
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      items.forEach(function(el){ io.observe(el); });
+    });
+  });
 })();

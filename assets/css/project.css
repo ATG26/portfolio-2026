@@ -459,6 +459,7 @@ a{color:inherit;text-decoration:none;}
   margin-top:8px;
 }
 .td-grid--3{grid-template-columns:repeat(3,1fr);}
+.td-grid--2{grid-template-columns:repeat(2,1fr);margin-top:32px;max-width:600px;}
 .td-tile{
   aspect-ratio:191 / 107;
   background:#f0f0f0;
@@ -485,9 +486,29 @@ a{color:inherit;text-decoration:none;}
 }
 .td-section-sub:first-child{margin-top:0;}
 
+/* staggered wave: each grid tile carries its own index via --i so
+   the reveal ripples across the grid instead of popping in as one
+   block — set inline per tile (style="--i:3"), read here */
+.td-grid .reveal{transition-delay:calc(var(--i,0) * 55ms);}
+
+.td-deck-link{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-top:40px;
+  font-size:18px;
+  font-weight:400;
+  text-decoration:underline;
+  text-underline-offset:3px;
+  opacity:.85;
+  transition:opacity .2s ease;
+}
+.td-deck-link:hover{opacity:1;}
+
 @media (max-width:900px){
   .td-cross{aspect-ratio:1/1;}
   .td-cross-title span{font-size:clamp(16px,6vw,32px);}
   .td-grid{grid-template-columns:repeat(2,1fr);}
   .td-grid--3{grid-template-columns:repeat(2,1fr);}
+  .td-grid--2{grid-template-columns:repeat(2,1fr);max-width:none;}
 }
