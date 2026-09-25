@@ -940,6 +940,27 @@ a{color:inherit;text-decoration:none;}
   });
 })();
 
+/* nav "Home" — the parallax hero above is driven by scroll position via
+   getBoundingClientRect() math, and #home sits nested deep inside the
+   position:sticky hero-track. A native anchor-scroll into that nested
+   sticky target (from anywhere on the page — including scrolled deep
+   into the works section) can land at an offset that desyncs the
+   parallax math, the same issue fixed on the project pages' Home
+   links. Intercept the in-page nav Home click and just scroll the
+   window straight to the top instead — #home already IS the top of
+   the page, so this reaches the same spot without the sticky-target
+   miscalculation, from anywhere on the site. */
+(function(){
+  var link = document.querySelector('.site-nav a[href="#home"]');
+  if(!link) return;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  link.addEventListener('click', function(e){
+    e.preventDefault();
+    window.scrollTo({top:0, behavior: reduced ? 'auto' : 'smooth'});
+    history.replaceState(null, '', location.pathname + location.search);
+  });
+})();
+
 (function(){
   var track     = document.getElementById('heroTrack');
   var hero      = document.getElementById('hero');
