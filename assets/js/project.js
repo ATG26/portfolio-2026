@@ -7,29 +7,50 @@
    its resting state. */
 (function(){
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var items = document.querySelectorAll('.reveal');
-  if(!items.length) return;
+  var all = document.querySelectorAll('.reveal');
+  if(!all.length) return;
 
   if(!('IntersectionObserver' in window)){
-    items.forEach(function(el){ el.classList.add('is-visible'); });
+    all.forEach(function(el){ el.classList.add('is-visible'); });
     return;
   }
 
-  // The bottom rootMargin shrinks the effective viewport, so a tall
-  // section (the True Detective cross title card, a full-bleed
-  // photo) only counts as "intersecting" once it's crossed well
-  // into view — not the instant a sliver of it pokes up from the
-  // bottom edge. That was firing the reveal before it had scrolled
-  // into focus, so by the time you actually reached it the
-  // animation had already finished playing.
-  var io = new IntersectionObserver(function(entries){
+  // Ordinary elements (headings, paragraphs, the title/facts band)
+  // are shorter than the viewport, so "15% of the element visible"
+  // already means it's genuinely in view — this is what lets the
+  // page title and facts animate in right away since they're
+  // sitting in the lower half of the very first viewport on load.
+  var normal = [];
+  // Tall, full-bleed elements (the cross title card, the composite
+  // photo grids) are themselves close to or taller than the
+  // viewport, so that same 15%-of-its-own-area math is satisfied by
+  // a bare sliver poking up from the bottom edge — the reveal fired
+  // before the section had actually scrolled into focus. These use
+  // a threshold:0 trigger instead, gated purely by rootMargin, so
+  // they fire once their top edge crosses well into the viewport
+  // rather than by how much of their (large) area is showing.
+  var tall = [];
+  all.forEach(function(el){
+    (el.classList.contains('reveal-tall') ? tall : normal).push(el);
+  });
+
+  var normalIo = new IntersectionObserver(function(entries){
     entries.forEach(function(entry){
       if(entry.isIntersecting){
         entry.target.classList.add('is-visible');
-        io.unobserve(entry.target);
+        normalIo.unobserve(entry.target);
       }
     });
-  }, {threshold:.15, rootMargin:'0px 0px -25% 0px'});
+  }, {threshold:.15, rootMargin:'0px 0px -8% 0px'});
+
+  var tallIo = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('is-visible');
+        tallIo.unobserve(entry.target);
+      }
+    });
+  }, {threshold:0, rootMargin:'0px 0px -35% 0px'});
 
   // Wait two animation frames before observing so the browser has
   // definitely painted the hidden (.reveal) state at least once —
@@ -39,7 +60,8 @@
   // just appears instantly instead of blurring/fading/sliding in.
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
-      items.forEach(function(el){ io.observe(el); });
+      normal.forEach(function(el){ normalIo.observe(el); });
+      tall.forEach(function(el){ tallIo.observe(el); });
     });
   });
 })();
