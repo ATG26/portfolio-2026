@@ -42,18 +42,13 @@
     </div>
   </section>
 
-  <!-- the cross title card — referenced from the Figma frame's own
-       title treatment: a black cross over the frame, the wordmark
-       doubled with a heavily blurred ghost copy behind the sharp
-       one. See the note in the reply about the background photo. -->
-  <div class="td-cross-inset">
-    <div class="td-cross reveal reveal-tall">
-      <div class="td-cross-bar-v"></div>
-      <div class="td-cross-bar-h"></div>
-      <div class="td-cross-title">
-        <span class="ghost">True Detective</span>
-        <span class="sharp">True Detective</span>
-      </div>
+  <!-- the actual title sequence, right where the CSS-built cross
+       card used to stand in for it -->
+  <div class="td-media-inset">
+    <div class="td-title-video reveal reveal-tall">
+      <video controls preload="metadata" playsinline poster="../assets/images/true-detective-title-poster.jpg" width="1920" height="1080">
+        <source src="../assets/video/true-detective-title.mp4" type="video/mp4">
+      </video>
     </div>
   </div>
 

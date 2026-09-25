@@ -415,67 +415,30 @@ a{color:inherit;text-decoration:none;}
 }
 
 /* ============================================================
-   TRUE DETECTIVE — the cross title card, referenced from the
-   "True Detective Title Sequence" Figma frame: a black cross
-   dividing the frame into quadrants, with the title doubled —
-   one copy heavily blurred and offset behind a sharp copy in
-   front — the same "ghost behind the real thing" trick as the
-   rail icon hover and the wordmark letter-blur elsewhere on the
-   site. The frame's own background photography isn't available
-   to pull into code here, so this reproduces the graphic/
-   typographic treatment itself, which is what actually reads as
-   "True Detective" — a dark gradient stands in for the photo.
+   TRUE DETECTIVE — the title sequence video itself, right where
+   the CSS-built cross title card used to stand in for it. Inset to
+   the same content column as every other section (left/right 24px
+   gutter, 1392px wide) rather than running full-bleed, matching the
+   Figma frame's own framing.
    ============================================================ */
-/* the frame keeps this inset to the same content column as every
-   other section (left/right 24px gutter, 1392px wide) rather than
-   running full-bleed — .td-cross-inset carries that gutter/max-width,
-   .td-cross is the card itself */
-.td-cross-inset{
+.td-media-inset{
   max-width:var(--content);
   margin:0 auto 96px;
   padding:0 var(--gutter);
 }
-.td-cross{
+.td-title-video{
   position:relative;
   width:100%;
-  aspect-ratio:1392 / 783;
-  max-height:80vh;
+  aspect-ratio:16 / 9;
   overflow:hidden;
-  background:
-    radial-gradient(120% 140% at 28% 18%, #302f2b 0%, #171613 55%, #060605 100%);
-}
-.td-cross-bar-v{
-  position:absolute;
-  top:0;bottom:0;left:50%;
-  width:16.7%;
-  translate:-50% 0;
   background:#000;
 }
-.td-cross-bar-h{
-  position:absolute;
-  left:0;right:0;top:50%;
-  height:25.3%;
-  translate:0 -50%;
-  background:#000;
+.td-title-video video{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
 }
-.td-cross-title{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  pointer-events:none;
-}
-.td-cross-title span{
-  position:absolute;
-  font-weight:500;
-  font-size:clamp(22px,4.1vw,59px);
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  color:var(--white);
-  white-space:nowrap;
-}
-.td-cross-title .ghost{filter:blur(30px);translate:-26px 0;opacity:.8;}
 
 /* ============================================================
    MOSAIC GRID — the sketches / design board / final-designs
