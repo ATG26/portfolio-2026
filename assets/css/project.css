@@ -61,6 +61,13 @@ a{color:inherit;text-decoration:none;}
    it legible over the full-bleed opening image, whatever's in it,
    without needing to invert per-page.
    ============================================================ */
+/* no backdrop anymore — mix-blend-mode:difference inverts the nav
+   against whatever's actually behind it (light or dark sections
+   alike), so it stays legible without a frosted white bar sitting
+   on top of every page's hero image. White is the base color on
+   purpose: differenced against a white section that reads black,
+   against a dark section that reads white, against a color it
+   reads as that color's inverse. */
 .site-nav{
   position:fixed;
   top:0;left:0;right:0;
@@ -68,9 +75,7 @@ a{color:inherit;text-decoration:none;}
   display:flex;
   justify-content:flex-end;
   padding:33px var(--gutter) 22px;
-  background:rgba(255,255,255,.82);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
+  mix-blend-mode:difference;
 }
 .site-nav ul{
   display:flex;
@@ -84,7 +89,7 @@ a{color:inherit;text-decoration:none;}
   font-weight:500;
   line-height:1;
   text-transform:uppercase;
-  color:var(--ink);
+  color:var(--white);
   padding-bottom:6px;
   border-bottom:1px solid currentColor;
   transition:opacity .2s ease;
