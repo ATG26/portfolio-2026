@@ -637,6 +637,11 @@ a{color:inherit;text-decoration:none;}
   width:var(--card-w);
   margin-bottom:var(--card-gap);
   scroll-snap-align:center;
+  /* without this, a fast/flung scroll can sail straight past intermediate
+     cards to wherever momentum runs out — `always` forces the browser to
+     stop at every single card in turn, for a much more paginated, guided
+     feel one card at a time. */
+  scroll-snap-stop:always;
 }
 .works > .work:last-child{margin-bottom:0;}
 .work--right{margin-left:var(--card-offset);}
@@ -798,6 +803,12 @@ a{color:inherit;text-decoration:none;}
   min-height:358px;
   background:var(--footer-base);
   color:var(--white);
+  /* give the mandatory-snap scroll (see .work and the script at the
+     bottom of the page) somewhere to land after the last card — without
+     a snap point of its own here, mandatory snapping has nothing to
+     release into past the last .work and can trap the scroll just
+     short of the footer. */
+  scroll-snap-align:start;
 }
 /* aura layers below replace the old flat blue radial-gradient —
    reusing the exact hero aurora so the two dark sections match. */
