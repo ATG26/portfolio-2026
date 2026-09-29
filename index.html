@@ -423,11 +423,14 @@ a{color:inherit;text-decoration:none;}
    away, then blurs/fades the new one back in. */
 .hero-role{
   display:inline-block;
-  transition:opacity .5s ease-in-out, filter .5s cubic-bezier(.5,0,.5,1);
+  transition:opacity .7s ease-in-out,
+             filter .7s cubic-bezier(.5,0,.5,1),
+             transform .7s cubic-bezier(.45,0,.2,1);
 }
 .hero-role.is-out{
   opacity:0;
-  filter:blur(14px);
+  filter:blur(18px);
+  transform:translateY(-6px);
 }
 
 /* ============================================================
@@ -1542,7 +1545,7 @@ a{color:inherit;text-decoration:none;}
 
   var ROLES   = ['Interactive Designer', 'Football Enthusiast', 'Home Cook'];
   var HOLD_MS = 4200;  // how long a settled title stays on screen
-  var BLUR_MS = 500;   // matches the .hero-role CSS transition duration
+  var BLUR_MS = 700;   // matches the .hero-role CSS transition duration
   var idx = 0;
 
   function next(){
