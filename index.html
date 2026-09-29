@@ -638,7 +638,17 @@ a{color:inherit;text-decoration:none;}
 /* the card is now a link through to its project page — block, not inline,
    so it wraps the thumb + meta exactly like the plain div it replaced,
    with no layout side effects. */
-.work-link{display:block;}
+.work-link{
+  display:block;
+  /* the scroll-scrubbed reveal on the parent .work-reveal now settles
+     at .9 instead of 1 (see apply() in the script below) — this scales
+     the card the rest of the way back up to its old full size on hover
+     (1 / .9 = 1.111), on a different element than the one JS drives, so
+     the two scales stack instead of fighting over the same property. */
+  transform-origin:50% 50%;
+  transition:transform .4s cubic-bezier(.16,.84,.44,1);
+}
+.work:hover .work-link{transform:scale(1.111);}
 .work--right .work-reveal{
   translate:425px 225px;   /* mirrored x — same y/scale/opacity as the reference */
 }
@@ -667,8 +677,13 @@ a{color:inherit;text-decoration:none;}
   transition:transform .7s cubic-bezier(.16,.84,.44,1);
 }
 .work:hover .work-thumb img{transform:scale(1.03);}
+/* drop shadow lifted from the Capstone I frame's card treatment
+   (node 2087:3: box-shadow 16px 18px 25.1px -10px rgba(0,0,0,.5) on an
+   802px-wide reference card) — scaled by the same 1.3x this site's
+   cards already are relative to that reference (see --card-w's own
+   comment) so the shadow reads at the same proportion here. */
 .work:hover .work-thumb{
-  box-shadow:0 30px 60px -20px rgba(0,0,0,.35), 0 12px 24px -12px rgba(0,0,0,.25);
+  box-shadow:21px 23px 33px -13px rgba(0,0,0,.5);
 }
 
 .work-meta{
@@ -1244,7 +1259,11 @@ a{color:inherit;text-decoration:none;}
   function apply(el, p, fromRight){
     var x = (fromRight ? 425 : -425) * (1 - p);
     var y = 225 * (1 - p);
-    var s = .69 + .31 * p;
+    /* settles at .9, not 1 — the card sits 10% smaller than it used to
+       at rest, and grows to its old full size (1) on hover instead (see
+       .work:hover .work-link in the CSS) rather than overshooting past
+       it. Same .69 starting point off-screen, just a shorter climb. */
+    var s = .69 + .21 * p;
     var blur = (1 - p) * 18;   // gaussian-blurred while off-screen, sharp once settled
     el.style.opacity = p;
     el.style.translate = x.toFixed(1) + 'px ' + y.toFixed(1) + 'px';
