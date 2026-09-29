@@ -67,6 +67,14 @@ html{
      background straight against them, so bounce is disabled outright
      rather than trying to paint a matching color behind it. */
   overscroll-behavior-y:none;
+  /* guided scroll through the work cards (see .work below) — native
+     scroll-snap, not a JS-driven correction, so the browser itself stops
+     the scroll gesture exactly at the snap point with no separate
+     landing animation after the fact. `proximity`, not `mandatory`, so
+     it only pulls in when a scroll already ends near a card — it never
+     hijacks scrolling through the hero, which has no snap points of its
+     own (see .work). */
+  scroll-snap-type:y proximity;
 }
 body{
   margin:0;
@@ -627,6 +635,7 @@ a{color:inherit;text-decoration:none;}
 .work{
   width:var(--card-w);
   margin-bottom:var(--card-gap);
+  scroll-snap-align:center;
 }
 .works > .work:last-child{margin-bottom:0;}
 .work--right{margin-left:var(--card-offset);}
@@ -1566,114 +1575,6 @@ a{color:inherit;text-decoration:none;}
   }
 
   window.setTimeout(next, HOLD_MS);
-})();
-
-/* guided scroll through the works cards — referenced from Figma node
-   2534:4308 (Capstone I), which showed a viewport-height window landing
-   centered on each card in turn as it travels down the page. Rather than
-   hard CSS scroll-snap (which would fight the hero's own scroll-driven
-   pin/transition math), this waits for scrolling to actually settle,
-   then nudges the page the rest of the way so the nearest card centers
-   in the viewport — active scrolling itself is never interrupted.
-   Only engages once the hero-to-works travel has fully landed (the same
-   threshold the "Works" nav link scrolls to), so it never touches the
-   pinned hero scroll. Skipped under prefers-reduced-motion. */
-(function(){
-  if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
-
-  var track = document.getElementById('heroTrack');
-  var cards = Array.prototype.slice.call(document.querySelectorAll('.work'));
-  if (!track || !cards.length) return;
-
-  // settling took one debounce window at the *tail* of trackpad/touch
-  // momentum, which can still be gliding during a lull that long — firing
-  // a native `scrollTo({behavior:'smooth'})` right into that residual
-  // inertia is what read as "overscroll then snap back". Two fixes:
-  // wait a little longer, and drive the landing with our own rAF loop
-  // that re-asserts the scroll position every frame (so any leftover
-  // native momentum can't fight it), rather than a one-shot smooth call.
-  var SETTLE_MS = 260;
-  var DURATION  = 550;
-  var settleTimer = null;
-  var snapping = false;
-  var rafId = null;
-
-  function docTop(el){
-    return el.getBoundingClientRect().top + window.pageYOffset;
-  }
-
-  // the exact scrollY where the hero-to-works transition finishes (p=1) —
-  // same computation the "Works" nav link uses to land there directly.
-  function worksLandedY(){
-    var room = track.offsetHeight - window.innerHeight;
-    return docTop(track) + Math.max(room, 0);
-  }
-
-  function nearestCardTarget(){
-    var vh = window.innerHeight;
-    var here = window.pageYOffset;
-    var best = null, bestDist = Infinity;
-    cards.forEach(function(card){
-      var center = docTop(card) + card.offsetHeight / 2;
-      var target = center - vh / 2;
-      var dist = Math.abs(target - here);
-      if (dist < bestDist){ bestDist = dist; best = target; }
-    });
-    // deep in the footer or otherwise far from every card -- leave it be
-    if (bestDist > vh * .75) return null;
-    return best;
-  }
-
-  // eases like the site's other reveals (cubic-bezier(.16,.84,.44,1) —
-  // fast start, gentle settle) but re-applied every frame instead of
-  // handed off once, so it always wins over any leftover momentum.
-  function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
-
-  function landOn(target){
-    var startY = window.pageYOffset;
-    var delta  = target - startY;
-    if (Math.abs(delta) < 1) return;
-    snapping = true;
-    var startTime = null;
-    function step(ts){
-      if (!snapping) return;   // cancelled by real user input, see below
-      if (startTime === null) startTime = ts;
-      var t = Math.min(1, (ts - startTime) / DURATION);
-      window.scrollTo(0, startY + delta * easeOutCubic(t));
-      if (t < 1){
-        rafId = window.requestAnimationFrame(step);
-      }else{
-        snapping = false;
-        rafId = null;
-      }
-    }
-    rafId = window.requestAnimationFrame(step);
-  }
-
-  function onScroll(){
-    if (snapping) return;
-    if (settleTimer) window.clearTimeout(settleTimer);
-    settleTimer = window.setTimeout(function(){
-      if (window.pageYOffset < worksLandedY() - 4) return;  // still inside the hero travel
-      var target = nearestCardTarget();
-      if (target == null) return;
-      if (Math.abs(target - window.pageYOffset) < 2) return;
-      landOn(target);
-    }, SETTLE_MS);
-  }
-
-  // real user input (never fired by our own programmatic scrollTo) —
-  // interrupt the landing animation immediately so it never fights an
-  // actual next scroll.
-  function interrupt(){
-    if (!snapping) return;
-    snapping = false;
-    if (rafId != null){ window.cancelAnimationFrame(rafId); rafId = null; }
-  }
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('wheel', interrupt, { passive: true });
-  window.addEventListener('touchstart', interrupt, { passive: true });
 })();
 
 </script>
