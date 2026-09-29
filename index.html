@@ -122,17 +122,22 @@ a{color:inherit;text-decoration:none;}
   .cursor-dot.is-uninking{
     animation:cursorInkToCircle .34s cubic-bezier(.65,0,.35,1) forwards;
   }
+  /* width/height (not transform) carry the size change — transform is
+     already owned every frame by the mousemove handler's position
+     tracking, and translate(-50%,-50%) re-centers on whatever the
+     element's current size is, so shrinking width/height here stays
+     centered on the pointer without fighting that inline style. */
   @keyframes cursorInkToSquare{
-    0%  {border-radius:50%;}
-    35% {border-radius:60% 40% 65% 35% / 55% 65% 35% 45%;}
-    65% {border-radius:20% 80% 30% 70% / 75% 20% 80% 25%;}
-    100%{border-radius:6px;}
+    0%  {border-radius:50%; width:36px; height:36px;}
+    35% {border-radius:60% 40% 65% 35% / 55% 65% 35% 45%; width:33px; height:33px;}
+    65% {border-radius:20% 80% 30% 70% / 75% 20% 80% 25%; width:30px; height:30px;}
+    100%{border-radius:6px; width:30px; height:30px;}
   }
   @keyframes cursorInkToCircle{
-    0%  {border-radius:6px;}
-    35% {border-radius:70% 30% 75% 25% / 25% 70% 30% 75%;}
-    65% {border-radius:30% 70% 40% 60% / 65% 35% 65% 35%;}
-    100%{border-radius:50%;}
+    0%  {border-radius:6px; width:30px; height:30px;}
+    35% {border-radius:70% 30% 75% 25% / 25% 70% 30% 75%; width:33px; height:33px;}
+    65% {border-radius:30% 70% 40% 60% / 65% 35% 65% 35%; width:35px; height:35px;}
+    100%{border-radius:50%; width:36px; height:36px;}
   }
 }
 
