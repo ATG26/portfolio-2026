@@ -679,6 +679,17 @@ a{color:inherit;text-decoration:none;}
 }
 .work:hover .work-thumb img{transform:scale(1.03);}
 
+.work-thumb video{
+  position:absolute;
+  inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .4s ease;
+}
+.work:hover .work-thumb video{opacity:1;}
+
 .work-meta{
   display:flex;
   align-items:center;
@@ -941,6 +952,9 @@ a{color:inherit;text-decoration:none;}
           <a class="work-link" href="projects/true-detective.html" aria-label="View True Detective project">
         <div class="work-thumb">
           <img src="assets/images/true-detective.jpg" alt="True Detective title sequence" width="1604" height="902" loading="lazy">
+          <video class="work-video" muted playsinline loop preload="none" aria-hidden="true">
+            <source src="assets/video/true-detective-title.mp4" type="video/mp4">
+          </video>
         </div>
         <div class="work-meta">
           <h3 class="work-title">True Detective Title Sequence</h3>
@@ -1430,6 +1444,26 @@ a{color:inherit;text-decoration:none;}
     mouseY = e.clientY;
     if(rafId == null) rafId = window.requestAnimationFrame(tick);
   }, {passive:true});
+})();
+
+/* work-card hover video — a card with a <video> in its .work-thumb plays
+   it (muted, from the start) while hovered and pauses/resets on leave,
+   so the thumbnail comes alive in place instead of the static frame. */
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  Array.prototype.slice.call(document.querySelectorAll('.work')).forEach(function(work){
+    var video = work.querySelector('.work-thumb video');
+    if(!video) return;
+    if(reduced) return;
+    work.addEventListener('mouseenter', function(){
+      try{ video.currentTime = 0; }catch(e){}
+      var p = video.play();
+      if(p && p.catch) p.catch(function(){});
+    });
+    work.addEventListener('mouseleave', function(){
+      video.pause();
+    });
+  });
 })();
 
 </script>
