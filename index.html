@@ -1146,20 +1146,37 @@ a{color:inherit;text-decoration:none;}
      geometry stable for targetFor()'s calculations below. */
   var reveals = works.map(function(el){ return el.querySelector('.work-reveal'); });
   var rafId = null;
+  var introIndex = works.length - 1;   // introCard, when present, is pushed last
+  var introHeld  = false;              // were we already inside the hold last tick?
 
   function clamp(v,a,b){ return v < a ? a : (v > b ? b : v); }
 
   function targetFor(el){
-    /* the intro card is pinned in place by the z-space transition above
-       (translateY(hold) on its #worksIntro wrapper) for as long as the
-       hero-to-works travel hasn't fully landed — its bounding rect stays
-       visually centred throughout that hold, which would otherwise read
-       as "fully visible" here even while it's still meant to be hidden.
-       Forcing the target to 0 during the hold, and letting the LERP below
-       ease toward it like normal, is what makes it fade out/in smoothly
-       instead of the hard instant cut this used to do. */
-    if(el === introCard && introWrap.style.transform && introWrap.style.transform !== 'none'){
-      return 0;
+    if(el === introCard){
+      var held = introWrap.style.transform && introWrap.style.transform !== 'none';
+      if(held){
+        /* the intro card is pinned in place by the z-space transition
+           above (translateY(hold) on its #worksIntro wrapper) for as
+           long as the hero-to-works travel hasn't fully landed — its
+           bounding rect stays visually centred throughout that hold,
+           which would otherwise read as "fully visible" here even
+           while it's still meant to be hidden. Scrolling forward into
+           the hold, current is already decayed toward 0 from sitting
+           there a while, so LERPing the rest of the way still reads as
+           a smooth fade. But scrolling back UP out of the works section
+           can cross into the hold in a single fast flick, while current
+           is still sitting near 1 (fully visible, dead-centre) — the
+           LERP alone then needs dozens of frames to catch down to 0,
+           which is exactly long enough for the card to still be
+           on-screen, fully opaque, after the hero has already reclaimed
+           the view. Snapping current straight to 0 the instant the hold
+           (re)engages closes that gap — it's the same instant the hero
+           starts covering this same screen area again, so there's no
+           frame where a stale, still-visible card can show through. */
+        if(!introHeld){ introHeld = true; current[introIndex] = 0; }
+        return 0;
+      }
+      introHeld = false;
     }
     var vh = window.innerHeight;
     var r = el.getBoundingClientRect();
