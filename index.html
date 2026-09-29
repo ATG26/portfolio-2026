@@ -1591,16 +1591,25 @@ a{color:inherit;text-decoration:none;}
 
 /* directional scroll-snap for the work cards — scrolling DOWN through
    the works section is strongly guided (native scroll-snap-type:y
-   mandatory on <html>, so the browser lands the gesture dead-center on
-   the nearest card every time); scrolling UP is left completely free
-   (scroll-snap-type:none — no pull at all). Toggled on the fly by
-   direction, and switched off outright while still inside the hero's
-   own scroll-driven travel so it never fights that. */
+   mandatory + scroll-snap-stop:always on .work, so the browser lands
+   the gesture dead-center on every card in turn, never skipping one);
+   scrolling UP is left completely free (scroll-snap-type:none — no
+   pull at all). Switched off outright while still inside the hero's
+   own scroll-driven travel so it never fights that.
+
+   Direction is read from the actual input (wheel/touch deltas), not
+   from the resulting scrollY — reading it off scrollY caused cards to
+   get skipped on a fast scroll: the browser's own snap-correction
+   motion produces a tiny backward wiggle as it settles, which a
+   position-delta check misreads as "scrolling up" and flips snap-type
+   to 'none' mid-fling, canceling the very snap that was stopping it at
+   each card. Real wheel/touch events never fire from that native
+   correction, so they can't trigger the same feedback loop. */
 (function(){
   var track = document.getElementById('heroTrack');
   if (!track) return;
   var html = document.documentElement;
-  var lastY = window.pageYOffset;
+  var goingDown = true;
 
   function docTop(el){
     return el.getBoundingClientRect().top + window.pageYOffset;
@@ -1613,15 +1622,35 @@ a{color:inherit;text-decoration:none;}
     return docTop(track) + Math.max(room, 0);
   }
 
-  function update(){
+  function applySnap(){
     var y = window.pageYOffset;
-    var goingDown = y > lastY;
-    lastY = y;
     html.style.scrollSnapType = (y >= worksLandedY() - 4 && goingDown) ? 'y mandatory' : 'none';
   }
 
-  window.addEventListener('scroll', update, { passive: true });
-  update();
+  window.addEventListener('wheel', function(e){
+    if (Math.abs(e.deltaY) < .5) return;
+    goingDown = e.deltaY > 0;
+    applySnap();
+  }, { passive: true });
+
+  var touchY = null;
+  window.addEventListener('touchstart', function(e){
+    touchY = (e.touches && e.touches[0]) ? e.touches[0].clientY : null;
+  }, { passive: true });
+  window.addEventListener('touchmove', function(e){
+    if (touchY == null || !e.touches || !e.touches[0]) return;
+    var y = e.touches[0].clientY;
+    var delta = touchY - y;   // finger moving up the screen == scrolling down
+    if (Math.abs(delta) < 2) return;
+    goingDown = delta > 0;
+    touchY = y;
+    applySnap();
+  }, { passive: true });
+
+  // keep the hero-travel threshold current as the page scrolls, without
+  // letting scroll position itself decide direction
+  window.addEventListener('scroll', applySnap, { passive: true });
+  applySnap();
 })();
 
 </script>
