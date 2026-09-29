@@ -60,13 +60,6 @@ html{
   scroll-behavior:smooth;
   overflow-x:clip;    /* clip, not hidden — hidden would make <html> a scroll
                          container and break the sticky hero */
-  /* only the footer lands with a light snap now — testing the work
-     cards showed proximity's "closeness" threshold is actually quite
-     wide in practice (committing fully from ~300px away, most of the
-     gap between cards), so it fought the scroll between cards instead
-     of letting it flow freely. The hero's own sticky flythrough has no
-     snap point either way, so it was always untouched. */
-  scroll-snap-type:y proximity;
   /* the page background is white, but the hero and footer are dark —
      rubber-band overscroll past either edge would flash that white
      straight against them, so bounce is disabled outright rather than
@@ -663,7 +656,6 @@ a{color:inherit;text-decoration:none;}
   min-height:358px;
   background:var(--footer-base);
   color:var(--white);
-  scroll-snap-align:start;
 }
 /* aura layers below replace the old flat blue radial-gradient —
    reusing the exact hero aurora so the two dark sections match. */
@@ -1221,62 +1213,6 @@ a{color:inherit;text-decoration:none;}
     if(!dot.classList.contains('is-visible')) dot.classList.add('is-visible');
   }, {passive:true});
   document.addEventListener('mouseleave', function(){ dot.classList.remove('is-visible'); });
-})();
-
-/* guided scroll — CSS scroll-snap-align was tried directly on the
-   hero, the works-intro landing and every card (see the comment on
-   html's scroll-snap-type), but "proximity" snapping is a browser-
-   picked distance and turned out to be wide enough on this page's tall
-   sections to fight normal scrolling — it could grab and hold the
-   page from hundreds of pixels away, which read as a hard snap rather
-   than a nudge. This is a hand-rolled version instead: once scrolling
-   settles (no scroll events for a beat) and the page happens to
-   already be close-ish to a landing point (hero top, the works-intro
-   arrival, each card including the first one nested in works-intro,
-   the footer), it eases the rest of the way there so the section
-   finishes framed instead of half-scrolled. Stop further from a
-   landing point than that and it never engages — you keep full
-   freedom to park the page wherever a scroll happened to end, same as
-   the hero's flythrough and the travel between cards. */
-(function(){
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var track  = document.getElementById('heroTrack');
-  var footer = document.querySelector('.footer');
-  var cards  = Array.prototype.slice.call(document.querySelectorAll('.works .work'));
-  if(!track) return;
-
-  var THRESHOLD = 220;  // px — only guides in when already this close
-  var SETTLE_MS = 160;  // ms of no scroll before considering it "settled"
-  var timer = null;
-
-  function clamp(v,a,b){ return v < a ? a : (v > b ? b : v); }
-
-  function landingPoints(){
-    var vh = window.innerHeight;
-    var room = track.offsetHeight - vh;
-    var list = [0, room];
-    cards.forEach(function(el){ list.push(el.getBoundingClientRect().top + window.scrollY); });
-    if(footer) list.push(footer.getBoundingClientRect().top + window.scrollY);
-    return list;
-  }
-
-  function onSettle(){
-    var y = window.scrollY;
-    var maxY = document.documentElement.scrollHeight - window.innerHeight;
-    var best = null, bestDist = Infinity;
-    landingPoints().forEach(function(t){
-      var d = Math.abs(t - y);
-      if(d < bestDist){ bestDist = d; best = t; }
-    });
-    if(best !== null && bestDist > 2 && bestDist < THRESHOLD){
-      window.scrollTo({top: clamp(best, 0, maxY), behavior:'smooth'});
-    }
-  }
-
-  window.addEventListener('scroll', function(){
-    if(timer) clearTimeout(timer);
-    timer = setTimeout(onSettle, SETTLE_MS);
-  }, {passive:true});
 })();
 
 /* rail icon hover field — hovered icon scales 1.4, its immediate neighbor scales 1.2 */
