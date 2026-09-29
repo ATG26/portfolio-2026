@@ -67,14 +67,15 @@ html{
      background straight against them, so bounce is disabled outright
      rather than trying to paint a matching color behind it. */
   overscroll-behavior-y:none;
-  /* guided scroll through the work cards (see .work below) — native
-     scroll-snap, not a JS-driven correction, so the browser itself stops
-     the scroll gesture exactly at the snap point with no separate
-     landing animation after the fact. `proximity`, not `mandatory`, so
-     it only pulls in when a scroll already ends near a card — it never
-     hijacks scrolling through the hero, which has no snap points of its
-     own (see .work). */
-  scroll-snap-type:y proximity;
+  /* guided scroll through the work cards (see .work below and the script
+     at the bottom of the page) — native scroll-snap, not a JS-driven
+     landing correction, so the browser itself stops the scroll gesture
+     exactly at the snap point with no separate animation after the
+     fact. Starts at 'none'; the script switches it to 'y mandatory'
+     while scrolling down through the works section (strongly guided)
+     and back to 'none' while scrolling up (fully free) or anywhere
+     inside the hero (never hijacks that scroll). */
+  scroll-snap-type:none;
 }
 body{
   margin:0;
@@ -1575,6 +1576,41 @@ a{color:inherit;text-decoration:none;}
   }
 
   window.setTimeout(next, HOLD_MS);
+})();
+
+/* directional scroll-snap for the work cards — scrolling DOWN through
+   the works section is strongly guided (native scroll-snap-type:y
+   mandatory on <html>, so the browser lands the gesture dead-center on
+   the nearest card every time); scrolling UP is left completely free
+   (scroll-snap-type:none — no pull at all). Toggled on the fly by
+   direction, and switched off outright while still inside the hero's
+   own scroll-driven travel so it never fights that. */
+(function(){
+  var track = document.getElementById('heroTrack');
+  if (!track) return;
+  var html = document.documentElement;
+  var lastY = window.pageYOffset;
+
+  function docTop(el){
+    return el.getBoundingClientRect().top + window.pageYOffset;
+  }
+
+  // same "transition fully landed" threshold the "Works" nav link and
+  // .work-reveal handoff use elsewhere on the page.
+  function worksLandedY(){
+    var room = track.offsetHeight - window.innerHeight;
+    return docTop(track) + Math.max(room, 0);
+  }
+
+  function update(){
+    var y = window.pageYOffset;
+    var goingDown = y > lastY;
+    lastY = y;
+    html.style.scrollSnapType = (y >= worksLandedY() - 4 && goingDown) ? 'y mandatory' : 'none';
+  }
+
+  window.addEventListener('scroll', update, { passive: true });
+  update();
 })();
 
 </script>
