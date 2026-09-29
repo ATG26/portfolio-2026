@@ -85,7 +85,12 @@ a{color:inherit;text-decoration:none;}
    touch devices keep the platform default and never get the dot.
    ============================================================ */
 @media (pointer:fine){
-  body{cursor:none;}
+  /* body{cursor:none} alone leaves the browser's own default cursor
+     showing over links and buttons — the UA stylesheet sets cursor:pointer
+     directly on those elements, which wins over an inherited cursor:none
+     from an ancestor since a direct rule always beats an inherited one.
+     *{cursor:none} closes that gap for every element, clickable or not. */
+  *{cursor:none;}
   .cursor-dot{
     position:fixed;
     top:0;left:0;
