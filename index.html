@@ -419,11 +419,16 @@ a{color:inherit;text-decoration:none;}
   backface-visibility:hidden;
 }
 /* the role word/phrase cycles through a short list (see the script at
-   the bottom of the page) via a scramble/decrypt effect — characters
-   still resolving flash the site's existing accent color, landing back
-   to plain white once settled. */
-.hero-role{display:inline-block;}
-.scramble-char{color:#65878A;}
+   the bottom of the page) — each swap blurs/fades the outgoing title
+   away, then blurs/fades the new one back in. */
+.hero-role{
+  display:inline-block;
+  transition:opacity .5s ease-in-out, filter .5s cubic-bezier(.5,0,.5,1);
+}
+.hero-role.is-out{
+  opacity:0;
+  filter:blur(14px);
+}
 
 /* ============================================================
    INTRO — referenced from the "Aniref" frame (Capstone I, page WIP,
@@ -960,7 +965,7 @@ a{color:inherit;text-decoration:none;}
       <div class="hero-inner">
         <div class="hero-block" id="home">
           <h1 class="hero-name" aria-label="ADAM GALANTE"><span class="hero-name-adam" aria-hidden="true"><span class="letter">A</span><span class="letter">D</span><span class="letter">A</span><span class="letter">M</span></span> <span class="hero-name-galante" aria-hidden="true"><span class="letter">G</span><span class="letter">A</span><span class="letter">L</span><span class="letter">A</span><span class="letter">N</span><span class="letter">T</span><span class="letter">E</span></span></h1>
-          <p class="hero-sub">Buffalo, New York — <span class="hero-role" id="heroRole">Multimedia Designer</span></p>
+          <p class="hero-sub">Buffalo, New York — <span class="hero-role" id="heroRole">Interactive Designer</span></p>
         </div>
       </div>
     </header>
@@ -1528,78 +1533,29 @@ a{color:inherit;text-decoration:none;}
   });
 })();
 
-/* hero role scramble — the subhead's role cycles through a short list,
-   each swap resolving character-by-character through random glyphs
-   (à la a classic "text scramble" decrypt effect) rather than a plain
-   crossfade, since the site otherwise has no motion reference for this
-   piece. Characters still unresolved get the .scramble-char accent
-   color; settled characters render as plain text nodes (no lingering
-   span/color) so the resting state matches every other cycle. */
+/* hero role cycle — the subhead's role blurs/fades out, swaps text
+   while invisible, then blurs/fades back in, looping through ROLES. */
 (function(){
   var el = document.getElementById('heroRole');
   if(!el) return;
   if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
 
-  var ROLES = ['Multimedia Designer', 'Interactive Designer', 'Football Enthusiast', 'Home Cook'];
-  var CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-  var HOLD_MS = 2600;   // how long a resolved title sits before the next scramble
+  var ROLES   = ['Interactive Designer', 'Football Enthusiast', 'Home Cook'];
+  var HOLD_MS = 4200;  // how long a settled title stays on screen
+  var BLUR_MS = 500;   // matches the .hero-role CSS transition duration
   var idx = 0;
-  var queue = [];
-  var frame = 0;
-  var frameReq = null;
 
-  function randChar(){ return CHARS[Math.floor(Math.random() * CHARS.length)]; }
-
-  function render(){
-    var out = '';
-    var doneCount = 0;
-    for(var j = 0; j < queue.length; j++){
-      var q = queue[j];
-      if(frame >= q.end){
-        doneCount++;
-        out += q.to === ' ' ? '&nbsp;' : q.to;
-      }else if(frame >= q.start){
-        if(q.char === null || Math.random() < .32){ q.char = randChar(); }
-        out += '<span class="scramble-char">' + q.char + '</span>';
-      }else{
-        out += q.from === ' ' ? '&nbsp;' : (q.from || '');
-      }
-    }
-    el.innerHTML = out;
-    if(doneCount >= queue.length){
-      frameReq = null;
-      window.setTimeout(scrambleNext, HOLD_MS);
-      return;
-    }
-    frame++;
-    frameReq = window.requestAnimationFrame(render);
+  function next(){
+    el.classList.add('is-out');
+    window.setTimeout(function(){
+      idx = (idx + 1) % ROLES.length;
+      el.textContent = ROLES[idx];
+      el.classList.remove('is-out');
+      window.setTimeout(next, HOLD_MS);
+    }, BLUR_MS);
   }
 
-  function scrambleTo(text){
-    var from = el.textContent;
-    var len  = Math.max(from.length, text.length);
-    queue = [];
-    for(var j = 0; j < len; j++){
-      var start = Math.floor(Math.random() * 14);
-      queue.push({
-        from:  from[j] || '',
-        to:    text[j] || '',
-        start: start,
-        end:   start + 10 + Math.floor(Math.random() * 10),
-        char:  null
-      });
-    }
-    frame = 0;
-    if(frameReq) window.cancelAnimationFrame(frameReq);
-    render();
-  }
-
-  function scrambleNext(){
-    idx = (idx + 1) % ROLES.length;
-    scrambleTo(ROLES[idx]);
-  }
-
-  window.setTimeout(scrambleNext, HOLD_MS);
+  window.setTimeout(next, HOLD_MS);
 })();
 
 </script>
