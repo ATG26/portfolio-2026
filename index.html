@@ -39,6 +39,7 @@
   --black:#000000;
   --white:#ffffff;
   --ink:#000000;
+  --page-bg:#171717;
   --footer-base:#1f1f1f;
   --rail:#bebebe;
   --glow-near:#2d37af;
@@ -60,16 +61,17 @@ html{
   scroll-behavior:smooth;
   overflow-x:clip;    /* clip, not hidden — hidden would make <html> a scroll
                          container and break the sticky hero */
-  /* the page background is white, but the hero and footer are dark —
-     rubber-band overscroll past either edge would flash that white
-     straight against them, so bounce is disabled outright rather than
-     trying to paint a matching color behind it. */
+  /* the whole page is dark now (hero, works, and footer all share a
+     near-black background), but the shades still differ slightly —
+     rubber-band overscroll past either edge would flash a mismatched
+     background straight against them, so bounce is disabled outright
+     rather than trying to paint a matching color behind it. */
   overscroll-behavior-y:none;
 }
 body{
   margin:0;
-  background:var(--white);
-  color:var(--ink);
+  background:var(--page-bg);
+  color:var(--white);
   font-family:"Roboto Condensed","Arial Narrow",Arial,sans-serif;
   font-weight:400;
   -webkit-font-smoothing:antialiased;
@@ -197,8 +199,11 @@ a{color:inherit;text-decoration:none;}
    the same muted tone (rather than a partial-opacity white) keeps text
    and stroke reading as one consistent color on hover, not a faded one. */
 .site-nav a:hover{color:#b7b7b7;}
-.site-nav.on-light a{color:var(--ink);}
-.site-nav.on-light a:hover{color:#6b6b6b;}
+/* the works section is no longer a light background, so on-light no
+   longer needs a contrasting dark nav — kept as its own rule (rather
+   than deleted) in case a light section returns later. */
+.site-nav.on-light a{color:var(--white);}
+.site-nav.on-light a:hover{color:#b7b7b7;}
 
 /* ============================================================
    RIGHT RAIL — frame: 4 x 40x40 @ x1376, 19px gaps,
@@ -564,8 +569,8 @@ a{color:inherit;text-decoration:none;}
   position:relative;
   z-index:3;             /* the arriving plane paints in front of the hero */
   /* deliberately NO background: this box already overlaps the pinned hero,
-     so a white fill here would flood the lower viewport mid-travel and
-     spoil the reveal. The page background supplies the white instead. */
+     so a fill here would flood the lower viewport mid-travel and spoil
+     the reveal. The page background supplies the fill instead. */
   max-width:var(--canvas);
   /* pulled up under the pinned hero so both layers share the viewport
      while the camera travels between them */
@@ -734,7 +739,7 @@ a{color:inherit;text-decoration:none;}
   font-size:clamp(19px,2.22vw,32px);
   font-weight:500;
   line-height:1.19;
-  color:var(--ink);
+  color:var(--white);
 }
 .work-year{
   flex:none;
