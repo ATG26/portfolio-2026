@@ -94,7 +94,7 @@ a{color:inherit;text-decoration:none;}
   .cursor-dot{
     position:fixed;
     top:0;left:0;
-    width:36px;height:36px;
+    width:30.6px;height:30.6px;
     border-radius:50%;
     /* white, not black — difference blend against black does nothing,
        since |backdrop - 0| = backdrop; white is what actually inverts */
@@ -128,16 +128,16 @@ a{color:inherit;text-decoration:none;}
      element's current size is, so shrinking width/height here stays
      centered on the pointer without fighting that inline style. */
   @keyframes cursorInkToSquare{
-    0%  {border-radius:50%; width:36px; height:36px;}
-    35% {border-radius:60% 40% 65% 35% / 55% 65% 35% 45%; width:33px; height:33px;}
-    65% {border-radius:20% 80% 30% 70% / 75% 20% 80% 25%; width:30px; height:30px;}
-    100%{border-radius:6px; width:30px; height:30px;}
+    0%  {border-radius:50%; width:30.6px; height:30.6px;}
+    35% {border-radius:60% 40% 65% 35% / 55% 65% 35% 45%; width:28.05px; height:28.05px;}
+    65% {border-radius:20% 80% 30% 70% / 75% 20% 80% 25%; width:25.5px; height:25.5px;}
+    100%{border-radius:6px; width:25.5px; height:25.5px;}
   }
   @keyframes cursorInkToCircle{
-    0%  {border-radius:6px; width:30px; height:30px;}
-    35% {border-radius:70% 30% 75% 25% / 25% 70% 30% 75%; width:33px; height:33px;}
-    65% {border-radius:30% 70% 40% 60% / 65% 35% 65% 35%; width:35px; height:35px;}
-    100%{border-radius:50%; width:36px; height:36px;}
+    0%  {border-radius:6px; width:25.5px; height:25.5px;}
+    35% {border-radius:70% 30% 75% 25% / 25% 70% 30% 75%; width:28.05px; height:28.05px;}
+    65% {border-radius:30% 70% 40% 60% / 65% 35% 65% 35%; width:29.75px; height:29.75px;}
+    100%{border-radius:50%; width:30.6px; height:30.6px;}
   }
 }
 
