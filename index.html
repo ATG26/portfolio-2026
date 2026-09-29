@@ -105,26 +105,34 @@ a{color:inherit;text-decoration:none;}
     transform:translate(-50%,-50%);
     will-change:transform;
     opacity:0;               /* hidden until the first real mousemove */
-    /* bouncy overshoot on the border-radius change — a plain ease into
-       the blob shape read as flat; this gives the morph itself a little
-       give, like it's actually squishing into shape. */
-    transition:opacity .2s ease, border-radius .3s cubic-bezier(.34,1.56,.64,1);
+    transition:opacity .2s ease;
   }
   .cursor-dot.is-visible{opacity:1;}
-  /* a soft, irregular blob over anything clickable instead of a plain
-     rounded square — each corner pulled to a different radius (the
-     slash splits horizontal/vertical radii per corner) so it reads as
-     organic rather than geometric, then kept gently wobbling between
-     a few such blob shapes the whole time it's hovering so it feels
-     alive rather than just a second static shape. */
+  /* the circle-to-square morph doesn't move in a straight line between
+     the two border-radius values — it passes through a couple of
+     lopsided, dripping shapes on the way (each corner pulled to its own
+     radius, via the slash splitting horizontal/vertical radii per
+     corner), like the shape is briefly ink before it sets into a clean
+     square. forwards holds the end shape until the class is swapped;
+     leaving the same way back out (see .is-uninking) keeps it
+     symmetrical rather than just snapping to a plain circle. */
   .cursor-dot.is-clickable{
-    animation:cursorBlob 2.4s ease-in-out infinite;
+    animation:cursorInkToSquare .34s cubic-bezier(.65,0,.35,1) forwards;
   }
-  @keyframes cursorBlob{
-    0%,100%{border-radius:42% 58% 65% 35% / 45% 45% 55% 55%;}
-    25%{border-radius:62% 38% 30% 70% / 60% 35% 65% 40%;}
-    50%{border-radius:35% 65% 55% 45% / 65% 40% 60% 35%;}
-    75%{border-radius:55% 45% 70% 30% / 40% 62% 38% 60%;}
+  .cursor-dot.is-uninking{
+    animation:cursorInkToCircle .34s cubic-bezier(.65,0,.35,1) forwards;
+  }
+  @keyframes cursorInkToSquare{
+    0%  {border-radius:50%;}
+    35% {border-radius:60% 40% 65% 35% / 55% 65% 35% 45%;}
+    65% {border-radius:20% 80% 30% 70% / 75% 20% 80% 25%;}
+    100%{border-radius:6px;}
+  }
+  @keyframes cursorInkToCircle{
+    0%  {border-radius:6px;}
+    35% {border-radius:70% 30% 75% 25% / 25% 70% 30% 75%;}
+    65% {border-radius:30% 70% 40% 60% / 65% 35% 65% 35%;}
+    100%{border-radius:50%;}
   }
 }
 
@@ -1249,18 +1257,40 @@ a{color:inherit;text-decoration:none;}
   var dot = document.getElementById('cursorDot');
   if(!dot) return;
   var CLICKABLE = 'a, button, [role="button"], input, textarea, select, label, [onclick]';
+  var uninkTimer = null;
+
+  /* is-clickable and is-uninking are two ends of the same ink-morph —
+     entering plays the shape forward to a square and holds it there
+     (is-clickable); leaving plays the exact same kind of shape change
+     back down to a circle (is-uninking) instead of just snapping the
+     class off, so the un-morph looks as deliberate as the morph in.
+     is-uninking removes itself once its animation has actually had time
+     to finish, handing the dot back to its plain, unanimated resting
+     circle. */
+  function setClickable(active){
+    if(active){
+      clearTimeout(uninkTimer);
+      dot.classList.remove('is-uninking');
+      dot.classList.add('is-clickable');
+    }else if(dot.classList.contains('is-clickable')){
+      dot.classList.remove('is-clickable');
+      dot.classList.add('is-uninking');
+      clearTimeout(uninkTimer);
+      uninkTimer = setTimeout(function(){ dot.classList.remove('is-uninking'); }, 340);
+    }
+  }
+
   window.addEventListener('mousemove', function(e){
     dot.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px) translate(-50%,-50%)';
     if(!dot.classList.contains('is-visible')) dot.classList.add('is-visible');
     /* closest() walks up from whatever's directly under the cursor (an
        icon inside a link, a span inside a button) so hovering any part
-       of a clickable element blobs the dot, not just its exact edges. */
-    var overClickable = !!(e.target && e.target.closest && e.target.closest(CLICKABLE));
-    dot.classList.toggle('is-clickable', overClickable);
+       of a clickable element morphs the dot, not just its exact edges. */
+    setClickable(!!(e.target && e.target.closest && e.target.closest(CLICKABLE)));
   }, {passive:true});
   document.addEventListener('mouseleave', function(){
     dot.classList.remove('is-visible');
-    dot.classList.remove('is-clickable');
+    setClickable(false);
   });
 })();
 
