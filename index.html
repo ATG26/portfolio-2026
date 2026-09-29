@@ -120,14 +120,21 @@ a{color:inherit;text-decoration:none;}
      the size and color ease along the same timeline. forwards holds the
      end shape until the class is swapped; leaving the same way back out
      (see .is-uninking) keeps it symmetrical rather than just snapping
-     back. A slower duration and a gentler, more symmetrical ease (in
-     and out alike, instead of the previous curve's sharper snap at each
-     end) reads as noticeably smoother. */
+     back.
+
+     Also drops the difference blend mode for as long as it's hovering —
+     the dot then just sits on top in its own flat #65878A instead of
+     inverting whatever's under it, which is the point of a set hover
+     color in the first place (differenced, it wouldn't reliably still
+     read as that color against every backdrop). Blend mode isn't part
+     of the keyframes since there's nothing to ease between — it's back
+     to inverting the instant .is-uninking (or nothing) applies. */
   .cursor-dot.is-clickable{
-    animation:cursorInkToSquare .48s cubic-bezier(.45,0,.2,1) forwards;
+    animation:cursorInkToSquare .16s cubic-bezier(.45,0,.2,1) forwards;
+    mix-blend-mode:normal;
   }
   .cursor-dot.is-uninking{
-    animation:cursorInkToCircle .48s cubic-bezier(.45,0,.2,1) forwards;
+    animation:cursorInkToCircle .16s cubic-bezier(.45,0,.2,1) forwards;
   }
   /* width/height (not transform) carry the size change — transform is
      already owned every frame by the mousemove handler's position
@@ -1293,7 +1300,7 @@ a{color:inherit;text-decoration:none;}
       dot.classList.remove('is-clickable');
       dot.classList.add('is-uninking');
       clearTimeout(uninkTimer);
-      uninkTimer = setTimeout(function(){ dot.classList.remove('is-uninking'); }, 480);
+      uninkTimer = setTimeout(function(){ dot.classList.remove('is-uninking'); }, 160);
     }
   }
 
