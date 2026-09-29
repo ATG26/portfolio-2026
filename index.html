@@ -814,7 +814,35 @@ a{color:inherit;text-decoration:none;}
 
 /* ============================================================
    Responsive
+
+   Three tiers:
+     >= 1440px  — desktop, the base :root values above. .works caps
+                  at --canvas (1440px) and centers, so every card
+                  renders at the exact same fixed pixel size on any
+                  monitor at or above this width — nothing here
+                  scales it further.
+     901–1439px — tablet (below). Previously ungoverned: the same
+                  desktop --card-w/--card-offset/etc percentages
+                  just rode the viewport down, fluidly shrinking
+                  the cards well under their intended size and then
+                  jumping abruptly to the full-width phone layout
+                  right at 900px. This tier now owns its own values
+                  instead, holding the card at a size that reads
+                  intentionally in the narrower container and
+                  tightening the vertical rhythm to match, rather
+                  than just shrinking the desktop numbers.
+     <= 900px   — phone, single column (existing block below).
    ============================================================ */
+@media (max-width:1439px) and (min-width:901px){
+  :root{
+    --card-w:82%;
+    --card-offset:18%;
+    --card-gap:96px;
+    --title-gap:18px;
+    --works-tail:220px;
+  }
+}
+
 @media (max-width:900px){
   :root{
     --card-w:100%;
