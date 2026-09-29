@@ -1095,6 +1095,29 @@ a{color:inherit;text-decoration:none;}
   });
 })();
 
+/* "Works" has the same landing problem as Home above: the hero-to-works
+   journey is scroll-driven (see the frame() loop below), not a fixed
+   document offset, so the browser's native jump to #works can land
+   mid-transition — or short/long of it — depending on where the scroll
+   started. Intercept the click and scroll straight to the exact point
+   where the transition finishes (p=1): the true top of the work
+   section, computed fresh at click time so it's correct from anywhere
+   on the page, including from deep inside the works section already. */
+(function(){
+  var link  = document.querySelector('.site-nav a[href="#works"]');
+  var track = document.getElementById('heroTrack');
+  if(!link || !track) return;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  link.addEventListener('click', function(e){
+    e.preventDefault();
+    var trackTop = track.getBoundingClientRect().top + window.pageYOffset;
+    var room     = track.offsetHeight - window.innerHeight;
+    var target   = trackTop + Math.max(room, 0);
+    window.scrollTo({top: target, behavior: reduced ? 'auto' : 'smooth'});
+    history.replaceState(null, '', location.pathname + location.search);
+  });
+})();
+
 (function(){
   var track     = document.getElementById('heroTrack');
   var hero      = document.getElementById('hero');
