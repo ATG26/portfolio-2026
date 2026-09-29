@@ -1585,10 +1585,18 @@ a{color:inherit;text-decoration:none;}
   var cards = Array.prototype.slice.call(document.querySelectorAll('.work'));
   if (!track || !cards.length) return;
 
-  var SETTLE_MS = 160;   // how long scrolling must be quiet before snapping
+  // settling took one debounce window at the *tail* of trackpad/touch
+  // momentum, which can still be gliding during a lull that long — firing
+  // a native `scrollTo({behavior:'smooth'})` right into that residual
+  // inertia is what read as "overscroll then snap back". Two fixes:
+  // wait a little longer, and drive the landing with our own rAF loop
+  // that re-asserts the scroll position every frame (so any leftover
+  // native momentum can't fight it), rather than a one-shot smooth call.
+  var SETTLE_MS = 260;
+  var DURATION  = 550;
   var settleTimer = null;
   var snapping = false;
-  var unsnapTimer = null;
+  var rafId = null;
 
   function docTop(el){
     return el.getBoundingClientRect().top + window.pageYOffset;
@@ -1616,6 +1624,32 @@ a{color:inherit;text-decoration:none;}
     return best;
   }
 
+  // eases like the site's other reveals (cubic-bezier(.16,.84,.44,1) —
+  // fast start, gentle settle) but re-applied every frame instead of
+  // handed off once, so it always wins over any leftover momentum.
+  function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
+  function landOn(target){
+    var startY = window.pageYOffset;
+    var delta  = target - startY;
+    if (Math.abs(delta) < 1) return;
+    snapping = true;
+    var startTime = null;
+    function step(ts){
+      if (!snapping) return;   // cancelled by real user input, see below
+      if (startTime === null) startTime = ts;
+      var t = Math.min(1, (ts - startTime) / DURATION);
+      window.scrollTo(0, startY + delta * easeOutCubic(t));
+      if (t < 1){
+        rafId = window.requestAnimationFrame(step);
+      }else{
+        snapping = false;
+        rafId = null;
+      }
+    }
+    rafId = window.requestAnimationFrame(step);
+  }
+
   function onScroll(){
     if (snapping) return;
     if (settleTimer) window.clearTimeout(settleTimer);
@@ -1623,16 +1657,23 @@ a{color:inherit;text-decoration:none;}
       if (window.pageYOffset < worksLandedY() - 4) return;  // still inside the hero travel
       var target = nearestCardTarget();
       if (target == null) return;
-      var here = window.pageYOffset;
-      if (Math.abs(target - here) < 2) return;
-      snapping = true;
-      window.scrollTo({ top: target, behavior: 'smooth' });
-      if (unsnapTimer) window.clearTimeout(unsnapTimer);
-      unsnapTimer = window.setTimeout(function(){ snapping = false; }, 600);
+      if (Math.abs(target - window.pageYOffset) < 2) return;
+      landOn(target);
     }, SETTLE_MS);
   }
 
+  // real user input (never fired by our own programmatic scrollTo) —
+  // interrupt the landing animation immediately so it never fights an
+  // actual next scroll.
+  function interrupt(){
+    if (!snapping) return;
+    snapping = false;
+    if (rafId != null){ window.cancelAnimationFrame(rafId); rafId = null; }
+  }
+
   window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('wheel', interrupt, { passive: true });
+  window.addEventListener('touchstart', interrupt, { passive: true });
 })();
 
 </script>
