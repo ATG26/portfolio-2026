@@ -686,16 +686,19 @@ a{color:inherit;text-decoration:none;}
   gap:24px;
   margin-top:var(--title-gap);
 }
-/* the title/year sit hidden — tucked up into the card, invisible —
-   until hover, then drop down into their normal resting spot below
-   the thumb. Both tracks reuse the Capstone I file's own motion data
-   (node 2172:192, the one authored animation anywhere in this frame's
-   subtree — there's no hover-specific motion on the card itself to
-   pull from, so this is "the motion in it" in the most literal sense
-   available): its translate track's overshoot-then-settle curve for
-   the drop, and its opacity track's own curve for the fade, each kept
-   as its own separate easing exactly as authored rather than forcing
-   both onto one shared curve.
+/* the title/year sit hidden — tucked up into the card, blurred and
+   invisible — until hover, then drop into their normal resting spot
+   below the thumb, sharpening and fading in as they go. All three
+   tracks (position, opacity, blur) are re-pulled straight from the
+   Capstone I file's own motion data (node 2172:192 — the one authored
+   animation anywhere in this frame's subtree, so still "the motion in
+   it" in the most literal sense available): opacity and position both
+   actually ease with a plain ease-in-out, not the overshoot curve used
+   here previously — that was misread off an earlier, less precise
+   fetch of the same node. Only the blur track uses a distinct curve
+   (cubic-bezier(.5,0,.5,1)), so it's kept separate rather than folded
+   into the other two. Duration is the source clip's own ~25% mark
+   (0.501–0.502s of its 2s loop) rounded to .5s.
 
    Scoped to devices that can actually hover — a touch device has no
    hover state to reveal it with, so it stays at its plain, always-on
@@ -704,12 +707,15 @@ a{color:inherit;text-decoration:none;}
   .work-meta{
     opacity:0;
     transform:translateY(-22px);
-    transition:opacity .5s cubic-bezier(.851,-.001,.518,.998),
-               transform .5s cubic-bezier(0,0,0,1.011);
+    filter:blur(14px);
+    transition:opacity .5s ease-in-out,
+               transform .5s ease-in-out,
+               filter .5s cubic-bezier(.5,0,.5,1);
   }
   .work:hover .work-meta{
     opacity:1;
     transform:translateY(0);
+    filter:blur(0);
   }
 }
 .work-title{
