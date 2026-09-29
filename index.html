@@ -680,6 +680,13 @@ a{color:inherit;text-decoration:none;}
    like its siblings instead of a separately-timed one-shot transition. */
 @media (prefers-reduced-motion:reduce){
   .work-reveal{opacity:1;translate:none;scale:1;filter:none;}
+  /* .work--right .work-reveal{translate:425px 225px;} (two classes) is
+     more specific than the plain .work-reveal rule above (one class), so
+     it wins regardless of media query or source order — right-column
+     cards were staying shifted off to the side under reduced motion
+     instead of settling into place. Match its specificity here to
+     actually override it. */
+  .work--right .work-reveal{translate:none;}
 }
 
 .work-thumb{
