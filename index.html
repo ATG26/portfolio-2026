@@ -105,9 +105,27 @@ a{color:inherit;text-decoration:none;}
     transform:translate(-50%,-50%);
     will-change:transform;
     opacity:0;               /* hidden until the first real mousemove */
-    transition:opacity .2s ease;
+    /* bouncy overshoot on the border-radius change — a plain ease into
+       the blob shape read as flat; this gives the morph itself a little
+       give, like it's actually squishing into shape. */
+    transition:opacity .2s ease, border-radius .3s cubic-bezier(.34,1.56,.64,1);
   }
   .cursor-dot.is-visible{opacity:1;}
+  /* a soft, irregular blob over anything clickable instead of a plain
+     rounded square — each corner pulled to a different radius (the
+     slash splits horizontal/vertical radii per corner) so it reads as
+     organic rather than geometric, then kept gently wobbling between
+     a few such blob shapes the whole time it's hovering so it feels
+     alive rather than just a second static shape. */
+  .cursor-dot.is-clickable{
+    animation:cursorBlob 2.4s ease-in-out infinite;
+  }
+  @keyframes cursorBlob{
+    0%,100%{border-radius:42% 58% 65% 35% / 45% 45% 55% 55%;}
+    25%{border-radius:62% 38% 30% 70% / 60% 35% 65% 40%;}
+    50%{border-radius:35% 65% 55% 45% / 65% 40% 60% 35%;}
+    75%{border-radius:55% 45% 70% 30% / 40% 62% 38% 60%;}
+  }
 }
 
 /* ============================================================
@@ -1230,11 +1248,20 @@ a{color:inherit;text-decoration:none;}
   if(!window.matchMedia('(pointer:fine)').matches) return;
   var dot = document.getElementById('cursorDot');
   if(!dot) return;
+  var CLICKABLE = 'a, button, [role="button"], input, textarea, select, label, [onclick]';
   window.addEventListener('mousemove', function(e){
     dot.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px) translate(-50%,-50%)';
     if(!dot.classList.contains('is-visible')) dot.classList.add('is-visible');
+    /* closest() walks up from whatever's directly under the cursor (an
+       icon inside a link, a span inside a button) so hovering any part
+       of a clickable element blobs the dot, not just its exact edges. */
+    var overClickable = !!(e.target && e.target.closest && e.target.closest(CLICKABLE));
+    dot.classList.toggle('is-clickable', overClickable);
   }, {passive:true});
-  document.addEventListener('mouseleave', function(){ dot.classList.remove('is-visible'); });
+  document.addEventListener('mouseleave', function(){
+    dot.classList.remove('is-visible');
+    dot.classList.remove('is-clickable');
+  });
 })();
 
 /* rail icon hover field — hovered icon scales 1.4, its immediate neighbor scales 1.2 */
