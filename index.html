@@ -1568,6 +1568,73 @@ a{color:inherit;text-decoration:none;}
   window.setTimeout(next, HOLD_MS);
 })();
 
+/* guided scroll through the works cards — referenced from Figma node
+   2534:4308 (Capstone I), which showed a viewport-height window landing
+   centered on each card in turn as it travels down the page. Rather than
+   hard CSS scroll-snap (which would fight the hero's own scroll-driven
+   pin/transition math), this waits for scrolling to actually settle,
+   then nudges the page the rest of the way so the nearest card centers
+   in the viewport — active scrolling itself is never interrupted.
+   Only engages once the hero-to-works travel has fully landed (the same
+   threshold the "Works" nav link scrolls to), so it never touches the
+   pinned hero scroll. Skipped under prefers-reduced-motion. */
+(function(){
+  if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+
+  var track = document.getElementById('heroTrack');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.work'));
+  if (!track || !cards.length) return;
+
+  var SETTLE_MS = 160;   // how long scrolling must be quiet before snapping
+  var settleTimer = null;
+  var snapping = false;
+  var unsnapTimer = null;
+
+  function docTop(el){
+    return el.getBoundingClientRect().top + window.pageYOffset;
+  }
+
+  // the exact scrollY where the hero-to-works transition finishes (p=1) —
+  // same computation the "Works" nav link uses to land there directly.
+  function worksLandedY(){
+    var room = track.offsetHeight - window.innerHeight;
+    return docTop(track) + Math.max(room, 0);
+  }
+
+  function nearestCardTarget(){
+    var vh = window.innerHeight;
+    var here = window.pageYOffset;
+    var best = null, bestDist = Infinity;
+    cards.forEach(function(card){
+      var center = docTop(card) + card.offsetHeight / 2;
+      var target = center - vh / 2;
+      var dist = Math.abs(target - here);
+      if (dist < bestDist){ bestDist = dist; best = target; }
+    });
+    // deep in the footer or otherwise far from every card -- leave it be
+    if (bestDist > vh * .75) return null;
+    return best;
+  }
+
+  function onScroll(){
+    if (snapping) return;
+    if (settleTimer) window.clearTimeout(settleTimer);
+    settleTimer = window.setTimeout(function(){
+      if (window.pageYOffset < worksLandedY() - 4) return;  // still inside the hero travel
+      var target = nearestCardTarget();
+      if (target == null) return;
+      var here = window.pageYOffset;
+      if (Math.abs(target - here) < 2) return;
+      snapping = true;
+      window.scrollTo({ top: target, behavior: 'smooth' });
+      if (unsnapTimer) window.clearTimeout(unsnapTimer);
+      unsnapTimer = window.setTimeout(function(){ snapping = false; }, 600);
+    }, SETTLE_MS);
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+})();
+
 </script>
 
 </body>
