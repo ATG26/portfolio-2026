@@ -640,15 +640,16 @@ a{color:inherit;text-decoration:none;}
    with no layout side effects. */
 .work-link{
   display:block;
-  /* the scroll-scrubbed reveal on the parent .work-reveal now settles
-     at .9 instead of 1 (see apply() in the script below) — this scales
-     the card the rest of the way back up to its old full size on hover
-     (1 / .9 = 1.111), on a different element than the one JS drives, so
-     the two scales stack instead of fighting over the same property. */
+  /* the scroll-scrubbed reveal on the parent .work-reveal settles at .9
+     (see apply() in the script below) — this nudges the card back up a
+     bit further on hover, on a different element than the one JS
+     drives, so the two scales stack instead of fighting over the same
+     property. A lighter lift than a full return to 1 (.9 * 1.06 = .954)
+     reads as a subtle hover response rather than a big jump in size. */
   transform-origin:50% 50%;
   transition:transform .4s cubic-bezier(.16,.84,.44,1);
 }
-.work:hover .work-link{transform:scale(1.111);}
+.work:hover .work-link{transform:scale(1.06);}
 .work--right .work-reveal{
   translate:425px 225px;   /* mirrored x — same y/scale/opacity as the reference */
 }
@@ -681,9 +682,10 @@ a{color:inherit;text-decoration:none;}
    (node 2087:3: box-shadow 16px 18px 25.1px -10px rgba(0,0,0,.5) on an
    802px-wide reference card) — scaled by the same 1.3x this site's
    cards already are relative to that reference (see --card-w's own
-   comment) so the shadow reads at the same proportion here. */
+   comment) so the shadow reads at the same proportion here. Alpha
+   bumped up from the reference's .5 to .65 for a darker shadow. */
 .work:hover .work-thumb{
-  box-shadow:21px 23px 33px -13px rgba(0,0,0,.5);
+  box-shadow:21px 23px 33px -13px rgba(0,0,0,.65);
 }
 
 .work-meta{
