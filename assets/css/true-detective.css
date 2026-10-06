@@ -163,7 +163,6 @@ body.td{
   align-items:start;
   margin-top:clamp(40px,5.5vw,80px);
   padding-top:clamp(28px,5vw,80px);
-  border-top:1px solid var(--td-line);
 }
 .td-crops{aspect-ratio:1249/784;}
 .td-label-row{
