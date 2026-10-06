@@ -829,7 +829,7 @@ a{color:inherit;text-decoration:none;}
   letter-spacing:0;
   line-height:1.05;
 }
-.footer h2 .word{display:inline-block;white-space:nowrap;}
+.word{display:inline-block;white-space:nowrap;}
 /* same icons + hover field as the hero rail (.rail-link), laid out in a
    row: 40px hit areas on a 59px pitch like the frame */
 .footer-icons{
@@ -985,7 +985,7 @@ a{color:inherit;text-decoration:none;}
       <div class="hero-inner">
         <div class="hero-block" id="home">
           <h1 class="hero-name" aria-label="ADAM GALANTE"><span class="hero-name-adam" aria-hidden="true"><span class="letter">A</span><span class="letter">D</span><span class="letter">A</span><span class="letter">M</span></span> <span class="hero-name-galante" aria-hidden="true"><span class="letter">G</span><span class="letter">A</span><span class="letter">L</span><span class="letter">A</span><span class="letter">N</span><span class="letter">T</span><span class="letter">E</span></span></h1>
-          <p class="hero-sub">Buffalo, New York — <span class="hero-role" id="heroRole">Interactive Designer</span></p>
+          <p class="hero-sub"><span class="word"><span class="letter">B</span><span class="letter">u</span><span class="letter">f</span><span class="letter">f</span><span class="letter">a</span><span class="letter">l</span><span class="letter">o</span><span class="letter">,</span></span> <span class="word"><span class="letter">N</span><span class="letter">e</span><span class="letter">w</span></span> <span class="word"><span class="letter">Y</span><span class="letter">o</span><span class="letter">r</span><span class="letter">k</span></span> <span class="word"><span class="letter">—</span></span> <span class="hero-role" id="heroRole"><span class="word"><span class="letter">I</span><span class="letter">n</span><span class="letter">t</span><span class="letter">e</span><span class="letter">r</span><span class="letter">a</span><span class="letter">c</span><span class="letter">t</span><span class="letter">i</span><span class="letter">v</span><span class="letter">e</span></span> <span class="word"><span class="letter">D</span><span class="letter">e</span><span class="letter">s</span><span class="letter">i</span><span class="letter">g</span><span class="letter">n</span><span class="letter">e</span><span class="letter">r</span></span></span></p>
         </div>
       </div>
     </header>
@@ -1511,8 +1511,11 @@ a{color:inherit;text-decoration:none;}
 (function(){
   if(!window.matchMedia('(pointer:fine)').matches) return;
   if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
-  var letters = Array.prototype.slice.call(document.querySelectorAll('.hero-name .letter, .footer h2 .letter'));
-  if(!letters.length) return;
+  /* re-queried each frame: the hero role swaps its text (and so its
+     letter spans) every few seconds */
+  function getLetters(){
+    return Array.prototype.slice.call(document.querySelectorAll('.hero-name .letter, .hero-sub .letter, .footer h2 .letter'));
+  }
 
   var MAX_BLUR = 24;   // px, directly under the cursor
   var RADIUS   = 140;  // px falloff — sharp again past this distance
@@ -1520,12 +1523,11 @@ a{color:inherit;text-decoration:none;}
   var DECAY    = 0.022; // how slowly it lingers back to sharp — the trail
 
   var mouseX = -9999, mouseY = -9999;
-  var state = letters.map(function(){ return 0; });
   var rafId = null;
 
   function tick(){
     var stillMoving = false;
-    letters.forEach(function(el, i){
+    getLetters().forEach(function(el){
       var r = el.getBoundingClientRect();
       var cx = r.left + r.width / 2;
       var cy = r.top + r.height / 2;
@@ -1533,10 +1535,10 @@ a{color:inherit;text-decoration:none;}
       var dist = Math.sqrt(dx * dx + dy * dy);
       var t = Math.max(0, 1 - dist / RADIUS);
       var target = MAX_BLUR * t * t;      // quadratic falloff — soft gaussian-like curve
-      var cur = state[i];
+      var cur = el._blur || 0;
       cur += (target - cur) * (target > cur ? ATTACK : DECAY);
       if(Math.abs(cur) < 0.03) cur = 0;
-      state[i] = cur;
+      el._blur = cur;
       el.style.filter = cur > 0.03 ? 'blur(' + cur.toFixed(2) + 'px)' : '';
       if(cur > 0.03) stillMoving = true;
     });
@@ -1586,7 +1588,9 @@ a{color:inherit;text-decoration:none;}
     el.classList.add('is-out');
     window.setTimeout(function(){
       idx = (idx + 1) % ROLES.length;
-      el.textContent = ROLES[idx];
+      el.innerHTML = ROLES[idx].split(' ').map(function(w){
+        return '<span class="word">' + w.split('').map(function(ch){ return '<span class="letter">' + ch + '</span>'; }).join('') + '</span>';
+      }).join(' ');
       el.classList.remove('is-out');
       window.setTimeout(next, HOLD_MS);
     }, BLUR_MS);
