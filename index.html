@@ -572,7 +572,10 @@ a{color:inherit;text-decoration:none;}
 
 .rail{
   opacity:0;
-  scale:.87;
+  /* rests at full size — the entrance keyframes start from .87 on their
+     own. (This used to say .87, so when the script cleared the finished
+     animation the rail snapped from 1 back down to .87.) */
+  scale:1;
   transform-origin:center;
   animation:heroRailOpacity 3.4s linear forwards, heroRailScale 3.4s linear forwards;
 }
