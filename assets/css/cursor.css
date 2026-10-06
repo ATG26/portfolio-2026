@@ -1,0 +1,77 @@
+/* Custom cursor — shared with the homepage (copied verbatim from index.html so
+   every page behaves the same). Fine pointers only. */
+@media (pointer:fine){
+  /* body{cursor:none} alone leaves the browser's own default cursor
+     showing over links and buttons — the UA stylesheet sets cursor:pointer
+     directly on those elements, which wins over an inherited cursor:none
+     from an ancestor since a direct rule always beats an inherited one.
+     *{cursor:none} closes that gap for every element, clickable or not. */
+  *{cursor:none;}
+  .cursor-dot{
+    position:fixed;
+    top:0;left:0;
+    width:27.54px;height:27.54px;
+    border-radius:50%;
+    /* white, not black — difference blend against black does nothing,
+       since |backdrop - 0| = backdrop; white is what actually inverts.
+       Hovering something clickable shifts this to a set color instead
+       (see the keyframes below) — the difference blend still applies,
+       so it inverts against the backdrop starting from #65878A rather
+       than from white. */
+    background:#fff;
+    mix-blend-mode:difference;
+    pointer-events:none;
+    z-index:9999;
+    transform:translate(-50%,-50%);
+    will-change:transform;
+    opacity:0;               /* hidden until the first real mousemove */
+    transition:opacity .2s ease;
+  }
+  .cursor-dot.is-visible{opacity:1;}
+  /* the circle-to-square morph doesn't move in a straight line between
+     the two border-radius values — it passes through a few lopsided,
+     dripping shapes on the way (each corner pulled to its own radius,
+     via the slash splitting horizontal/vertical radii per corner), like
+     the shape is briefly ink before it sets into a clean square, while
+     the size and color ease along the same timeline. forwards holds the
+     end shape until the class is swapped; leaving the same way back out
+     (see .is-uninking) keeps it symmetrical rather than just snapping
+     back.
+
+     Also drops the difference blend mode for as long as it's hovering —
+     the dot then just sits on top in its own flat #65878A instead of
+     inverting whatever's under it, which is the point of a set hover
+     color in the first place (differenced, it wouldn't reliably still
+     read as that color against every backdrop). Blend mode isn't part
+     of the keyframes since there's nothing to ease between — it's back
+     to inverting the instant .is-uninking (or nothing) applies. */
+  .cursor-dot.is-clickable{
+    animation:cursorInkToSquare .16s cubic-bezier(.45,0,.2,1) forwards;
+    mix-blend-mode:normal;
+  }
+  .cursor-dot.is-uninking{
+    animation:cursorInkToCircle .16s cubic-bezier(.45,0,.2,1) forwards;
+  }
+  /* width/height (not transform) carry the size change — transform is
+     already owned every frame by the mousemove handler's position
+     tracking, and translate(-50%,-50%) re-centers on whatever the
+     element's current size is, so shrinking width/height here stays
+     centered on the pointer without fighting that inline style. Five
+     stops instead of four (an extra one at each end) give the blend —
+     shape, size and color together — more of the path to ease along
+     rather than jumping between a couple of waypoints. */
+  @keyframes cursorInkToSquare{
+    0%  {border-radius:50%; width:27.54px; height:27.54px; background:#ffffff;}
+    25% {border-radius:58% 42% 62% 38% / 55% 60% 40% 45%; width:26.2px; height:26.2px; background:#b8c8ca;}
+    50% {border-radius:35% 65% 45% 55% / 65% 40% 60% 35%; width:24.8px; height:24.8px; background:#8aa4a6;}
+    75% {border-radius:15% 85% 25% 75% / 80% 15% 85% 20%; width:23.5px; height:23.5px; background:#70898c;}
+    100%{border-radius:0; width:22.95px; height:22.95px; background:#65878A;}
+  }
+  @keyframes cursorInkToCircle{
+    0%  {border-radius:0; width:22.95px; height:22.95px; background:#65878A;}
+    25% {border-radius:20% 80% 30% 70% / 75% 20% 80% 25%; width:23.8px; height:23.8px; background:#70898c;}
+    50% {border-radius:45% 55% 55% 45% / 60% 35% 65% 40%; width:25.2px; height:25.2px; background:#8aa4a6;}
+    75% {border-radius:65% 35% 70% 30% / 40% 65% 35% 60%; width:26.5px; height:26.5px; background:#b8c8ca;}
+    100%{border-radius:50%; width:27.54px; height:27.54px; background:#ffffff;}
+  }
+}
