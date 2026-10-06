@@ -233,6 +233,10 @@ a{color:inherit;text-decoration:none;}
   gap:12px;
   transition:opacity .3s ease;
 }
+/* the hero's rail never shows over the footer: retired instantly (no fade,
+   no waiting on the scroll script's next frame) the moment any of the
+   footer is on screen — see the footer reveal script. */
+.rail.is-retired{opacity:0 !important;visibility:hidden;pointer-events:none;transition:none;}
 .rail-link{
   width:40px;height:40px;
   display:flex;align-items:center;justify-content:center;
@@ -1474,10 +1478,20 @@ a{color:inherit;text-decoration:none;}
   if(!footer) return;
   var els = Array.prototype.slice.call(footer.querySelectorAll('.footer-reveal'));
   if(!els.length) return;
+  var rail = document.getElementById('rail');
   function set(on){
     els.forEach(function(el){ el.classList.toggle('is-in', on); });
   }
   if(!('IntersectionObserver' in window)){ set(true); return; }
+  /* the hero's fixed social rail is retired by the scroll script a frame
+     later, which showed it flashing over the footer for a moment when the
+     page jumped straight down (the Contact link); this hides it the
+     instant the footer appears. */
+  new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(rail) rail.classList.toggle('is-retired', en.isIntersecting);
+    });
+  }, { threshold:[0] }).observe(footer);
   new IntersectionObserver(function(entries){
     entries.forEach(function(en){
       if(en.intersectionRatio >= .25) set(true);
