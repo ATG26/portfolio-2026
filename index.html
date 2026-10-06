@@ -835,19 +835,29 @@ a{color:inherit;text-decoration:none;}
 .word{display:inline-block;white-space:nowrap;}
 /* same icons + hover field as the hero rail (.rail-link), laid out in a
    row: 40px hit areas on a 59px pitch like the frame */
-/* scroll-scrubbed entrance — the hero wordmark's entrance from the
-   "Home" Figma frame (rise 172px, fade up, blur 100px -> 0, each piece a
-   beat after the last), driven by scroll position so it plays back out
-   as you scroll away. See the "footer reveal" script at the bottom. */
+/* entrance — the hero wordmark's own keyframes (the heroAdam, heroGalante and
+   heroSub sets) reused as-is, so the footer rises 172px, fades up and un-blurs
+   from 100px at exactly the hero's speed and cadence. The -.23s delay
+   just skips the hero timeline's idle lead-in so it starts the moment the
+   footer is in view (see the "footer reveal" script at the bottom). */
 .footer-reveal{
   opacity:0;
   translate:0 172px;
   filter:blur(100px);
-  will-change:opacity,translate,filter;
+  will-change:opacity,filter,translate;
 }
 .footer-copy.footer-reveal{translate:none;}
+.footer h2.footer-reveal.is-in{
+  animation:heroAdamOpacity 3.4s linear -.23s forwards, heroAdamBlur 3.4s linear -.23s forwards, heroAdamTranslate 3.4s linear -.23s forwards;
+}
+.footer-icons.footer-reveal.is-in{
+  animation:heroGalanteOpacity 3.4s linear -.23s forwards, heroGalanteBlur 3.4s linear -.23s forwards, heroGalanteTranslate 3.4s linear -.23s forwards;
+}
+.footer-copy.footer-reveal.is-in{
+  animation:heroSubOpacity 3.4s linear -.23s forwards, heroSubBlur 3.4s linear -.23s forwards;
+}
 @media (prefers-reduced-motion:reduce){
-  .footer-reveal,.footer-copy.footer-reveal{opacity:1;translate:none;filter:none;}
+  .footer .footer-reveal,.footer .footer-reveal.is-in{animation:none !important;opacity:1;translate:none;filter:none;}
 }
 .footer-icons{
   display:flex;
@@ -1454,83 +1464,26 @@ a{color:inherit;text-decoration:none;}
   kick();
 })();
 
-/* footer reveal, scroll-scrubbed — the hero wordmark's entrance from the
-   "Home" Figma frame (get_motion_context on node 2460:2070): each piece
-   rises 172px, fades up and un-blurs from 100px, with that frame's own
-   per-track easing curves and staggered timing (heading, then icons,
-   then copyright, which only fades/unblurs like the Figma subhead).
-   Progress is how much of the footer is on screen, LERPed so a fast
-   flick catches up smoothly, and it reverses when you scroll back up. */
+/* footer reveal — plays the hero wordmark's exact entrance (same keyframes,
+   easing, 3.4s timeline and heading -> icons -> copyright cadence as the
+   hero; see .footer-reveal in the CSS) once the footer scrolls into view,
+   and re-arms when it has fully left the screen so it plays again on the
+   next visit. */
 (function(){
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var footer = document.getElementById('contact');
   if(!footer) return;
   var els = Array.prototype.slice.call(footer.querySelectorAll('.footer-reveal'));
-  if(els.length !== 3) return;
-
-  /* CSS-style cubic-bezier(x1,y1,x2,y2) -> function of progress */
-  function bezier(x1, y1, x2, y2){
-    function cx(t){ return 3*x1*t*(1-t)*(1-t) + 3*x2*t*t*(1-t) + t*t*t; }
-    function cy(t){ return 3*y1*t*(1-t)*(1-t) + 3*y2*t*t*(1-t) + t*t*t; }
-    return function(x){
-      if(x <= 0) return 0;
-      if(x >= 1) return 1;
-      var lo = 0, hi = 1, t = x;
-      for(var i = 0; i < 22; i++){
-        t = (lo + hi) / 2;
-        if(cx(t) < x) lo = t; else hi = t;
-      }
-      return cy(t);
-    };
+  if(!els.length) return;
+  function set(on){
+    els.forEach(function(el){ el.classList.toggle('is-in', on); });
   }
-  var LINEAR = function(x){ return x; };
-
-  /* from/to = the slice of the 0..1 scroll progress each piece plays in
-     (the Figma timeline's offsets, normalised so the last piece ends at 1) */
-  var PIECES = [
-    { from:0,    to:.471, y:172, op:bezier(.838,-.01,.818,1.001), tr:bezier(.039,-.011,0,1.007), bl:bezier(.44,.008,.381,1.007) },
-    { from:.154, to:.627, y:172, op:bezier(.911,.007,.889,1.004), tr:bezier(.072,-.004,0,1.015), bl:bezier(.42,0,.58,1) },
-    { from:.528, to:1,    y:0,   op:bezier(.969,-.01,.781,.994),  tr:LINEAR,                      bl:bezier(.963,-.005,.5,1) }
-  ];
-
-  var LERP = .06, EPS = .0015;
-  var current = 0, rafId = null;
-
-  function clamp(v,a,b){ return v < a ? a : (v > b ? b : v); }
-
-  function visibleFraction(){
-    var r = footer.getBoundingClientRect();
-    var d = Math.min(r.height, window.innerHeight * .8);
-    return clamp((window.innerHeight - r.top) / d, 0, 1);
-  }
-
-  function apply(v){
-    PIECES.forEach(function(pc, i){
-      var t = clamp((v - pc.from) / (pc.to - pc.from), 0, 1);
-      var el = els[i];
-      el.style.opacity = pc.op(t).toFixed(3);
-      el.style.translate = '0px ' + (pc.y * (1 - pc.tr(t))).toFixed(1) + 'px';
-      var blur = 100 * (1 - pc.bl(t));
-      el.style.filter = blur > .1 ? 'blur(' + blur.toFixed(1) + 'px)' : 'none';
+  if(!('IntersectionObserver' in window)){ set(true); return; }
+  new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.intersectionRatio >= .25) set(true);
+      else if(en.intersectionRatio === 0) set(false);
     });
-  }
-
-  function tick(){
-    var target = visibleFraction();
-    current += (target - current) * LERP;
-    var settled = Math.abs(target - current) <= EPS;
-    if(settled) current = target;
-    apply(current);
-    rafId = settled ? null : window.requestAnimationFrame(tick);
-  }
-
-  function kick(){
-    if(rafId == null){ rafId = window.requestAnimationFrame(tick); }
-  }
-  window.addEventListener('scroll', kick, {passive:true});
-  window.addEventListener('resize', kick);
-  window.addEventListener('load', kick);
-  kick();
+  }, { threshold:[0, .25] }).observe(footer);
 })();
 
 /* custom cursor dot — fine pointers only */
