@@ -1,0 +1,196 @@
+/* ============================================================
+   TRUE DETECTIVE case study — rebuilt from the Figma/Design-canvas
+   layout. Scoped to body.td so nothing here touches the other
+   project pages that share project.css. Dark #1A2223 page, moss
+   (#8FA574) eyebrow tags, teal (#9DBCBF) secondary copy, hairline
+   dividers. Sizes are the 1440 canvas values, expressed as clamp()s
+   so the layout scales down instead of breaking.
+   ============================================================ */
+body.td{
+  --td-bg:#1A2223;
+  --td-band:#111718;
+  --td-teal:#9DBCBF;
+  --td-moss:#8FA574;
+  --td-line:rgba(255,255,255,.14);
+  background:var(--td-bg);
+  color:#fff;
+}
+.td .project-open-media{aspect-ratio:2880/1372;}
+
+/* ---- title + facts band ---- */
+.td-band{
+  background:var(--td-band);
+  border-top:4px solid #6C7B58;
+  padding:clamp(18px,1.5vw,22px) var(--gutter) clamp(36px,3.9vw,56px);
+}
+.td-band-inner{max-width:var(--content);margin:0 auto;}
+.td-title{
+  margin:0 0 clamp(24px,3.2vw,46px);
+  font-size:clamp(34px,5.83vw,84px);
+  font-weight:500;
+  text-transform:uppercase;
+  line-height:normal;
+}
+.td-facts{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1fr;
+  gap:24px 32px;
+}
+.td-fact h3{
+  margin:0 0 12px;
+  font-size:clamp(18px,1.67vw,24px);
+  font-weight:500;
+  line-height:normal;
+  color:var(--td-teal);
+}
+.td-fact p{
+  margin:0;
+  max-width:230px;
+  font-size:clamp(16px,1.39vw,20px);
+  font-weight:300;
+  line-height:normal;
+  color:rgba(255,255,255,.88);
+}
+
+/* ---- video ---- */
+.td-media-inset{
+  margin:clamp(40px,7.5vw,108px) auto clamp(64px,9vw,130px);
+}
+.td-back{
+  display:inline-block;
+  margin:0 0 20px;
+  font-size:15px;
+  font-weight:500;
+  opacity:.6;
+  transition:opacity .2s ease;
+}
+.td-back:hover{opacity:1;}
+.td .td-media-inset{max-width:var(--content);padding:0 var(--gutter);}
+
+/* ---- shared section bits ---- */
+.td-section{padding:0 var(--gutter);}
+.td-inner{max-width:var(--content);margin:0 auto;}
+.td-h2{
+  margin:0;
+  font-size:clamp(40px,4.44vw,64px);
+  font-weight:500;
+  line-height:normal;
+}
+.td-eyebrow{
+  margin:0 0 14px;
+  font-size:16px;
+  font-weight:500;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  line-height:normal;
+  color:var(--td-moss);
+}
+.td-h3{
+  margin:0 0 clamp(14px,2.1vw,30px);
+  font-size:clamp(24px,2.22vw,32px);
+  font-weight:500;
+  line-height:normal;
+}
+.td-h3--caps{text-transform:uppercase;}
+.td-body{
+  margin:0;
+  font-size:clamp(16px,1.39vw,20px);
+  font-weight:300;
+  line-height:1.3;
+}
+.td-body--lg{font-size:clamp(18px,1.67vw,24px);line-height:1.2;}
+.td-teal{color:var(--td-teal);}
+.td-rule{border:0;border-top:1px solid var(--td-line);margin:0;}
+.td-shot{
+  position:relative;
+  overflow:hidden;
+  background:#000;
+  box-shadow:0 0 0 1px rgba(255,255,255,.12);
+}
+.td-shot img{display:block;width:100%;height:100%;object-fit:cover;}
+
+/* ---- overview ---- */
+.td-overview{padding-bottom:clamp(64px,8vw,115px);}
+.td-hook{
+  margin:clamp(32px,4.4vw,64px) 0 0;
+  max-width:1100px;
+  font-size:clamp(26px,3.06vw,44px);
+  font-weight:300;
+  line-height:1.15;
+  color:var(--td-teal);
+}
+.td-overview .td-rule{margin:clamp(40px,5.5vw,80px) 0 clamp(32px,2.8vw,40px);}
+.td-cols{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:48px clamp(40px,7vw,100px);
+}
+.td-cols > div{max-width:540px;}
+
+/* ---- design process ---- */
+.td-process{padding-bottom:clamp(64px,8vw,115px);}
+.td-process .td-h2{margin-bottom:clamp(32px,5.5vw,80px);}
+.td-row{
+  display:grid;
+  align-items:start;
+  gap:24px clamp(24px,2.6vw,38px);
+  padding-top:clamp(28px,2.2vw,32px);
+  border-top:1px solid var(--td-line);
+  margin-bottom:clamp(40px,3.9vw,56px);
+}
+.td-row--text-left{grid-template-columns:minmax(0,551fr) minmax(0,802fr);}
+.td-row--img-left{grid-template-columns:minmax(0,802fr) minmax(0,551fr);}
+.td-row--img-left .td-shot{order:-1;}
+.td-row:last-child{margin-bottom:0;}
+.td-row .td-body--lg + .td-body--lg{margin-top:20px;}
+
+/* ---- key takeaways ---- */
+.td-takeaways{padding-bottom:clamp(64px,8vw,115px);}
+.td-takeaways .td-h2{margin:0 auto clamp(28px,4vw,57px);max-width:var(--canvas);padding:0 var(--gutter);}
+.td-phones{width:100%;aspect-ratio:2880/854;margin:0;}
+.td-takeaways .td-inner{max-width:var(--canvas);padding:0 var(--gutter);}
+.td-outputs{
+  display:grid;
+  grid-template-columns:minmax(0,576fr) minmax(0,696fr);
+  gap:32px clamp(40px,8.3vw,120px);
+  align-items:start;
+  margin-top:clamp(40px,5.5vw,80px);
+  padding-top:clamp(28px,5vw,80px);
+  border-top:1px solid var(--td-line);
+}
+.td-crops{aspect-ratio:1249/784;}
+.td-pills{display:flex;flex-wrap:wrap;gap:12px;margin:26px 0 0;padding:0;list-style:none;}
+.td-pills li{
+  height:36px;
+  line-height:34px;
+  padding:0 16px;
+  border:1px solid rgba(255,255,255,.35);
+  border-radius:18px;
+  font-size:14px;
+  font-weight:500;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.td-outputs .td-body + .td-body{margin-top:clamp(18px,2.4vw,34px);}
+.td-final{
+  aspect-ratio:2785/1204;
+  margin-top:clamp(40px,5.5vw,80px);
+}
+
+/* ---- what I learned ---- */
+.td-learned{padding-bottom:clamp(64px,8vw,115px);}
+.td-learned .td-h2{margin-bottom:clamp(32px,6vw,86px);}
+.td-learned .td-h3{font-size:clamp(20px,1.67vw,24px);color:var(--td-teal);margin-bottom:16px;}
+
+/* ---- next project / footer sit on the same dark page ---- */
+.td .project-next{background:var(--td-band);}
+
+@media (max-width:900px){
+  .td-facts{grid-template-columns:1fr 1fr;}
+  .td-cols{grid-template-columns:1fr;}
+  .td-row--text-left,.td-row--img-left{grid-template-columns:1fr;}
+  .td-row--img-left .td-shot{order:0;}
+  .td-outputs{grid-template-columns:1fr;}
+  .td-pills{margin-bottom:8px;}
+}
