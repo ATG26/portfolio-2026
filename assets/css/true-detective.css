@@ -195,3 +195,270 @@ body.td{
   .td-row--img-left .td-shot{order:0;}
   .td-outputs{grid-template-columns:1fr;}
 }
+
+
+/* ============================================================
+   FOOTER — the homepage's "Get in touch" footer, ported 1:1
+   (aurora layers, letter blur, rail-link hover field, entrance)
+   ============================================================ */
+body.td{--glow-near:#2d37af;--glow-far:#151a5a;}
+.rail-link{
+  width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--white);
+  opacity:.75;
+  transition:opacity .3s ease, transform .3s ease;
+}
+.rail-link svg{width:20.16px;height:20.16px;display:block;fill:currentColor;}
+.rail-link.is-hovered{opacity:1;transform:scale(1.8);}
+.rail-link.is-neighbor{opacity:1;transform:scale(1.2);}
+.letter{
+  display:inline-block;
+  will-change:filter;
+  transition:filter .06s ease-out;
+}
+.aura-layer-1{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(154deg, transparent 18%, rgba(12,72,61,0.06) 29%, rgba(0,229,255,0.40) 36%, rgb(255,255,255) 42%, rgba(73,207,158,0.32) 48%, rgba(38,158,119,0.22) 55%, rgba(0,183,255,0.30) 62%, rgba(15,76,65,0.08) 68%, transparent 82%);
+  mix-blend-mode:screen;
+  filter:blur(122px);
+  will-change:transform;
+  pointer-events:none;
+  animation:auraFloat1 11s ease-in-out infinite;
+}
+.aura-layer-2{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(128deg, transparent 28%, rgba(15,82,96,0.06) 38%, rgba(0,183,255,0.35) 43%, rgb(255,255,255) 48%, rgba(68,197,185,0.22) 52%, rgba(0,229,255,0.25) 57%, rgba(25,105,112,0.10) 62%, transparent 76%);
+  mix-blend-mode:screen;
+  filter:blur(108px);
+  opacity:.9;
+  will-change:transform;
+  pointer-events:none;
+  animation:auraFloat2 13s ease-in-out infinite;
+  animation-delay:-5s;
+}
+.aura-layer-3{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse 78% 20% at 51% 53%, rgba(65,183,155,0.24) 0%, rgba(30,102,91,0.10) 45%, transparent 82%);
+  mix-blend-mode:screen;
+  filter:blur(101px);
+  opacity:.9;
+  will-change:transform;
+  pointer-events:none;
+  animation:auraFloat3 10s ease-in-out infinite;
+  animation-delay:-2s;
+}
+.aura-layer-4{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse 48% 9% at 52% 50%, rgba(190,255,226,0.14) 0%, rgba(91,195,163,0.06) 45%, transparent 80%);
+  mix-blend-mode:screen;
+  filter:blur(252px);
+  will-change:transform;
+  pointer-events:none;
+  animation:auraFloat4 15s ease-in-out infinite;
+  animation-delay:-8s;
+}
+.aura-layer-5{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to top, rgba(1,5,13,0.90) 0%, rgba(2,7,16,0.58) 28%, rgba(3,9,20,0.20) 55%, transparent 78%);
+  mix-blend-mode:multiply;
+  filter:blur(115px);
+  opacity:.9;
+  will-change:transform;
+  pointer-events:none;
+  animation:auraFloat5 12s ease-in-out infinite;
+  animation-delay:-10s;
+}
+.aura-layer-6{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse 50% 28% at 72% 18%, rgba(89,62,151,0.10) 0%, rgba(57,44,100,0.04) 45%, transparent 82%);
+  mix-blend-mode:screen;
+  filter:blur(198px);
+  animation:auraFloat6 14s ease-in-out infinite;
+  animation-delay:-6s;
+  opacity:.7;
+  will-change:transform;
+  pointer-events:none;
+}
+
+@keyframes auraFloat1{
+  0%{transform:translate3d(0,0,0) scale(1);}
+  30%{transform:translate3d(-28%,20%,0) scale(1.42);}
+  62%{transform:translate3d(22%,-26%,0) scale(0.68);}
+  100%{transform:translate3d(0,0,0) scale(1);}
+}
+@keyframes auraFloat2{
+  0%{transform:translate3d(0,0,0) scale(1);}
+  35%{transform:translate3d(26%,-20%,0) scale(0.66);}
+  70%{transform:translate3d(-20%,26%,0) scale(1.4);}
+  100%{transform:translate3d(0,0,0) scale(1);}
+}
+@keyframes auraFloat3{
+  0%{transform:translate3d(0,0,0) scale(1);}
+  40%{transform:translate3d(-32%,-16%,0) scale(1.5);}
+  75%{transform:translate3d(26%,20%,0) scale(0.62);}
+  100%{transform:translate3d(0,0,0) scale(1);}
+}
+@keyframes auraFloat4{
+  0%{transform:translate3d(0,0,0) scale(1);}
+  33%{transform:translate3d(20%,26%,0) scale(1.36);}
+  68%{transform:translate3d(-26%,-20%,0) scale(0.68);}
+  100%{transform:translate3d(0,0,0) scale(1);}
+}
+@keyframes auraFloat5{
+  0%{transform:translate3d(0,0,0) scale(1);}
+  45%{transform:translate3d(-20%,14%,0) scale(1.28);}
+  80%{transform:translate3d(16%,-20%,0) scale(0.8);}
+  100%{transform:translate3d(0,0,0) scale(1);}
+}
+@keyframes auraFloat6{
+  0%{transform:translate3d(0,0,0) scale(1);}
+  38%{transform:translate3d(24%,18%,0) scale(0.6);}
+  72%{transform:translate3d(-24%,-14%,0) scale(1.48);}
+  100%{transform:translate3d(0,0,0) scale(1);}
+}
+
+@keyframes heroAdamOpacity{
+  0%{opacity:0;}
+  6.764%{animation-timing-function:cubic-bezier(.838,-.01,.818,1.001);opacity:0;}
+  31.864%{opacity:1;}
+  100%{opacity:1;}
+}
+@keyframes heroAdamBlur{
+  0%{filter:blur(100px);}
+  6.764%{animation-timing-function:cubic-bezier(.44,.008,.381,1.007);filter:blur(100px);}
+  31.814%{filter:blur(0px);}
+  100%{filter:blur(0px);}
+}
+@keyframes heroAdamTranslate{
+  0%{translate:0 172px;}
+  6.764%{animation-timing-function:cubic-bezier(.039,-.011,0,1.007);translate:0 172px;}
+  31.814%{translate:0 0px;}
+  100%{translate:0 0px;}
+}
+@keyframes heroGalanteOpacity{
+  0%{opacity:0;}
+  14.955%{animation-timing-function:cubic-bezier(.911,.007,.889,1.004);opacity:0;}
+  40.055%{opacity:1;}
+  100%{opacity:1;}
+}
+@keyframes heroGalanteBlur{
+  0%{filter:blur(100px);}
+  14.955%{animation-timing-function:ease-in-out;filter:blur(100px);}
+  40.055%{filter:blur(0px);}
+  100%{filter:blur(0px);}
+}
+@keyframes heroGalanteTranslate{
+  0%{translate:0 172px;}
+  14.955%{animation-timing-function:cubic-bezier(.072,-.004,0,1.015);translate:0 172px;}
+  40.005%{translate:0 0px;}
+  100%{translate:0 0px;}
+}
+
+@keyframes heroSubOpacity{
+  0%{opacity:0;}
+  34.8%{animation-timing-function:cubic-bezier(.969,-.01,.781,.994);opacity:0;}
+  59.9%{opacity:1;}
+  100%{opacity:1;}
+}
+@keyframes heroSubBlur{
+  0%{filter:blur(100px);}
+  34.8%{animation-timing-function:cubic-bezier(.963,-.005,.5,1);filter:blur(100px);}
+  59.85%{filter:blur(0px);}
+  100%{filter:blur(0px);}
+}
+.footer{
+  position:relative;
+  overflow:hidden;
+  min-height:326px;
+  background:var(--footer-base);
+  color:var(--white);
+  /* give the mandatory-snap scroll (see .work and the script at the
+     bottom of the page) somewhere to land after the last card — without
+     a snap point of its own here, mandatory snapping has nothing to
+     release into past the last .work and can trap the scroll just
+     short of the footer. */
+  scroll-snap-align:start;
+}
+/* aura layers below replace the old flat blue radial-gradient —
+   reusing the exact hero aurora so the two dark sections match. */
+.footer-inner{
+  position:relative;
+  max-width:var(--canvas);
+  margin:0 auto;
+  padding:clamp(40px,5.21vw,75px) 25px 0;
+}
+.footer h2{
+  margin:0;
+  font-size:clamp(44px,5.28vw,76px);
+  font-weight:700;
+  letter-spacing:0;
+  line-height:1.05;
+}
+.word{display:inline-block;white-space:nowrap;}
+/* same icons + hover field as the hero rail (.rail-link), laid out in a
+   row: 40px hit areas on a 59px pitch like the frame */
+/* entrance — the hero wordmark's own keyframes (the heroAdam, heroGalante and
+   heroSub sets) reused as-is, so the footer rises 172px, fades up and un-blurs
+   from 100px at exactly the hero's speed and cadence. The -.23s delay
+   just skips the hero timeline's idle lead-in so it starts the moment the
+   footer is in view (see the "footer reveal" script at the bottom). */
+.footer-reveal{
+  opacity:0;
+  translate:0 172px;
+  filter:blur(100px);
+  will-change:opacity,filter,translate;
+}
+.footer-copy.footer-reveal{translate:none;}
+.footer h2.footer-reveal.is-in{
+  animation:heroAdamOpacity 3.4s linear -.23s forwards, heroAdamBlur 3.4s linear -.23s forwards, heroAdamTranslate 3.4s linear -.23s forwards;
+}
+.footer-icons.footer-reveal.is-in{
+  animation:heroGalanteOpacity 3.4s linear -.23s forwards, heroGalanteBlur 3.4s linear -.23s forwards, heroGalanteTranslate 3.4s linear -.23s forwards;
+}
+.footer-copy.footer-reveal.is-in{
+  animation:heroSubOpacity 3.4s linear -.23s forwards, heroSubBlur 3.4s linear -.23s forwards;
+}
+@media (prefers-reduced-motion:reduce){
+  .footer .footer-reveal,.footer .footer-reveal.is-in{animation:none !important;opacity:1;translate:none;filter:none;}
+}
+.footer-icons{
+  display:flex;
+  gap:19px;
+  margin:clamp(16px,2.15vw,31px) 0 0 2px;
+}
+.footer-copy{
+  margin:clamp(28px,3.4vw,49px) 0 0;
+  padding-bottom:clamp(20px,2.4vw,35px);
+  text-align:center;
+  font-size:14px;
+  font-weight:300;
+  line-height:normal;
+}
+
+/* ============================================================
+/* beat project.css's older footer rules (same specificity otherwise) */
+body.td .footer::before{content:none;}
+body.td .footer{min-height:326px;}
+body.td .footer-inner{margin:0 auto;padding:clamp(40px,5.21vw,75px) 25px 0;}
+body.td .footer h2{margin:0;font-size:clamp(44px,5.28vw,76px);font-weight:700;letter-spacing:0;line-height:1.05;}
+body.td .footer-copy{margin:clamp(28px,3.4vw,49px) 0 0;padding-bottom:clamp(20px,2.4vw,35px);text-align:center;font-size:14px;font-weight:300;line-height:normal;}
+@media (max-width:900px){
+  body.td .footer-inner{padding:36px 16px 0;}
+  body.td .footer-icons{margin-left:0;}
+  .aura-layer-1{filter:blur(85px);}
+  .aura-layer-2{filter:blur(75px);}
+  .aura-layer-3{filter:blur(70px);}
+  .aura-layer-4{filter:blur(175px);}
+  .aura-layer-5{filter:blur(80px);}
+  .aura-layer-6{filter:blur(138px);}
+}
+@media (prefers-reduced-motion:reduce){
+  .aura-layer-1,.aura-layer-2,.aura-layer-3,.aura-layer-4,.aura-layer-5,.aura-layer-6{animation:none;}
+}
