@@ -153,6 +153,7 @@ body.td{
 /* ---- key takeaways ---- */
 .td-takeaways{padding-bottom:clamp(64px,8vw,115px);}
 .td-takeaways .td-h2{margin:0 auto clamp(28px,4vw,57px);max-width:var(--canvas);padding:0 var(--gutter);}
+.td-takeaways-rule{max-width:calc(var(--canvas) - 2*var(--gutter));margin-left:auto;margin-right:auto;}
 .td-phones{width:100%;aspect-ratio:2880/854;margin:0;background:#fff;}
 .td-takeaways .td-inner{max-width:var(--canvas);padding:0 var(--gutter);}
 .td-outputs{
