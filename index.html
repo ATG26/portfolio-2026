@@ -1623,6 +1623,34 @@ a{color:inherit;text-decoration:none;}
   });
 })();
 
+/* hero subhead fit — the line under the wordmark is sized so its width is
+   always exactly the width of the last name ("GALANTE"), at every viewport.
+   Measures both and scales the subhead's font-size to match; re-runs on
+   resize and once fonts have loaded. (The CSS clamp() on .hero-sub is only
+   the first-paint fallback.) */
+(function(){
+  var sub = document.querySelector('.hero-sub');
+  var last = document.querySelector('.hero-name-galante');
+  if(!sub || !last) return;
+  function textWidth(el){
+    var r = document.createRange();
+    r.selectNodeContents(el);
+    return r.getBoundingClientRect().width;
+  }
+  function fit(){
+    sub.style.fontSize = '';
+    var target = last.getBoundingClientRect().width;
+    var cur = textWidth(sub);
+    if(!target || !cur) return;
+    var fs = parseFloat(getComputedStyle(sub).fontSize);
+    sub.style.fontSize = (fs * target / cur).toFixed(3) + 'px';
+  }
+  fit();
+  window.addEventListener('resize', fit);
+  window.addEventListener('load', fit);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+})();
+
 /* directional scroll-snap for the work cards — scrolling DOWN through
    the works section is strongly guided (native scroll-snap-type:y
    mandatory + scroll-snap-stop:always on .work, so the browser lands
