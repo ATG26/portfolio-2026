@@ -264,7 +264,6 @@
   new IntersectionObserver(function(entries){
     entries.forEach(function(en){
       if(en.intersectionRatio >= .25) set(true);
-      else if(en.intersectionRatio === 0) set(false);
     });
   }, { threshold:[0, .25] }).observe(footer);
 })();
