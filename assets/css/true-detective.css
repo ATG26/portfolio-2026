@@ -422,13 +422,13 @@ body.td{--glow-near:#2d37af;--glow-far:#151a5a;}
 }
 .footer-copy.footer-reveal{translate:none;}
 .footer h2.footer-reveal.is-in{
-  animation:heroAdamOpacity 3.4s linear -.23s forwards, heroAdamBlur 3.4s linear -.23s forwards, heroAdamTranslate 3.4s linear -.23s forwards;
+  animation:heroAdamOpacity 1.7s linear -.11s forwards, heroAdamBlur 1.7s linear -.11s forwards, heroAdamTranslate 1.7s linear -.11s forwards;
 }
 .footer-icons.footer-reveal.is-in{
-  animation:heroGalanteOpacity 3.4s linear -.23s forwards, heroGalanteBlur 3.4s linear -.23s forwards, heroGalanteTranslate 3.4s linear -.23s forwards;
+  animation:heroGalanteOpacity 1.7s linear -.11s forwards, heroGalanteBlur 1.7s linear -.11s forwards, heroGalanteTranslate 1.7s linear -.11s forwards;
 }
 .footer-copy.footer-reveal.is-in{
-  animation:heroSubOpacity 3.4s linear -.23s forwards, heroSubBlur 3.4s linear -.23s forwards;
+  animation:heroSubOpacity 1.7s linear -.11s forwards, heroSubBlur 1.7s linear -.11s forwards;
 }
 @media (prefers-reduced-motion:reduce){
   .footer .footer-reveal,.footer .footer-reveal.is-in{animation:none !important;opacity:1;translate:none;filter:none;}
