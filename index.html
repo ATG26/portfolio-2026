@@ -205,8 +205,11 @@ a{color:inherit;text-decoration:none;}
   color:var(--white);
   padding-bottom:6px;
   border-bottom:1px solid currentColor;
-  transition:color .3s ease;
+  transition:color .3s ease, border-bottom-width .25s ease, padding-bottom .25s ease;
 }
+/* the link for the section the visitor is currently in gets a slightly
+   thicker underline; padding gives back the extra pixel so nothing shifts */
+.site-nav a.is-current{border-bottom-width:2px;padding-bottom:5px;}
 /* the underline is currentColor, so a plain color change already carries
    it along in lockstep — no separate opacity fade needed. Softening to
    the same muted tone (rather than a partial-opacity white) keeps text
@@ -901,6 +904,7 @@ a{color:inherit;text-decoration:none;}
   .site-nav{padding:20px 16px 0;}
   .site-nav ul{gap:20px;}
   .site-nav a{font-size:12px;padding-bottom:4px;}
+  .site-nav a.is-current{padding-bottom:3px;}
   /* the rail is a desktop flourish from the frame — at phone widths it
      lands straight on top of the wordmark, so it steps aside */
   .rail{display:none;}
@@ -1711,6 +1715,41 @@ a{color:inherit;text-decoration:none;}
   applySnap();
 })();
 
+
+/* nav scroll-spy — marks the link for the section currently on screen */
+(function(){
+  var links = {
+    home:    document.querySelector('.site-nav a[href="#home"]'),
+    works:   document.querySelector('.site-nav a[href="#works"]'),
+    gallery: document.querySelector('.site-nav a[href="#gallery"]'),
+    contact: document.querySelector('.site-nav a[href="#contact"]')
+  };
+  var track   = document.getElementById('heroTrack');
+  var gallery = document.getElementById('gallery');
+  var footer  = document.getElementById('contact');
+  if(!track || !gallery || !footer || !links.home) return;
+  var current = null, ticking = false;
+  function update(){
+    ticking = false;
+    var vh = window.innerHeight, y = window.pageYOffset;
+    var trackTop = track.getBoundingClientRect().top + y;
+    var worksAt  = trackTop + Math.max(track.offsetHeight - vh, 0) - 40;
+    var key = 'home';
+    if(y >= worksAt) key = 'works';
+    if(gallery.getBoundingClientRect().top <= vh * .5) key = 'gallery';
+    if(footer.getBoundingClientRect().top <= vh * .8) key = 'contact';
+    if(key === current) return;
+    current = key;
+    Object.keys(links).forEach(function(k){
+      if(links[k]) links[k].classList.toggle('is-current', k === key);
+    });
+  }
+  function req(){ if(!ticking){ ticking = true; requestAnimationFrame(update); } }
+  window.addEventListener('scroll', req, {passive:true});
+  window.addEventListener('resize', req);
+  window.addEventListener('load', req);
+  update();
+})();
 </script>
 
 </body>
