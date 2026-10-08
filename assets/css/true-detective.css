@@ -127,7 +127,7 @@ body.td{
   color:var(--td-teal);
 }
 .td-rule--top{margin:0 0 clamp(24px,3vw,43px);}
-.td-cols--overview{margin-top:clamp(56px,10.4vw,150px);}
+.td-cols--overview{margin-top:clamp(16px,2vw,28px);}
 .td-cols{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
