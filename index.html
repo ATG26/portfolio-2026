@@ -52,6 +52,7 @@
   /* ---- works rhythm (from the frame) ---- */
   --card-w:65.91%;        /* 802 * 1.3 = 1042.6 / 1392, then .12 smaller */
   --card-offset:34.09%;   /* 100% - --card-w, keeps right-aligned cards flush */
+  --text-ratio:.517;      /* (100% - --card-w) / --card-w: room beside a card, in card widths */
   --card-gap:128px;       /* space between cards */
   --title-gap:20px;       /* image bottom -> title row */
   --works-tail:310px;     /* last title -> footer */
@@ -730,64 +731,67 @@ a{color:inherit;text-decoration:none;}
 }
 .work:hover .work-thumb video{opacity:1;}
 
-.work-meta{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:24px;
-  margin-top:var(--title-gap);
+/* ============================================================
+   CARD COPY — category, title and a short description sit beside each
+   card on the OPPOSITE side from the one it travels in from. It reveals
+   with the same scroll-scrubbed progress as the card (position, opacity
+   and blur — see apply() in the script at the bottom of the page):
+   beside a left card the copy slides in from off-page left; beside a
+   right card it emerges from behind the card. The card sits above it
+   (z-index) so it can pass behind.
+   ============================================================ */
+.work{position:relative;}
+.work-reveal{position:relative;z-index:2;}
+.work-copy{
+  position:absolute;
+  top:50%;
+  z-index:1;
+  width:calc(var(--text-ratio) * 100% - 32px);
+  transform:translateY(-50%);
+  opacity:0;
+  will-change:opacity,translate,filter;
 }
-/* the title/year sit hidden — tucked up into the card, blurred and
-   invisible — until hover, then drop into their normal resting spot
-   below the thumb, sharpening and fading in as they go. All three
-   tracks (position, opacity, blur) are re-pulled straight from the
-   Capstone I file's own motion data (node 2172:192 — the one authored
-   animation anywhere in this frame's subtree, so still "the motion in
-   it" in the most literal sense available): opacity and position both
-   actually ease with a plain ease-in-out, not the overshoot curve used
-   here previously — that was misread off an earlier, less precise
-   fetch of the same node. Only the blur track uses a distinct curve
-   (cubic-bezier(.5,0,.5,1)), so it's kept separate rather than folded
-   into the other two. Duration is the source clip's own ~25% mark
-   (0.501–0.502s of its 2s loop) rounded to .5s.
-
-   Scoped to devices that can actually hover — a touch device has no
-   hover state to reveal it with, so it stays at its plain, always-on
-   resting state there instead of hiding the caption permanently. */
-@media (hover:hover){
-  .work-meta{
-    opacity:0;
-    transform:translateY(-22px);
-    filter:blur(14px);
-    transition:opacity .5s ease-in-out,
-               transform .5s ease-in-out,
-               filter .5s cubic-bezier(.5,0,.5,1);
-  }
-  .work:hover .work-meta{
-    opacity:1;
-    transform:translateY(0);
-    filter:blur(0);
-  }
-}
-.work-title{
-  margin:0;
-  font-size:clamp(19px,2.22vw,32px);
-  font-weight:500;
-  line-height:1.19;
-  color:var(--white);
-}
-.work-year{
-  flex:none;
-  display:inline-flex;
-  align-items:center;
-  justify-content:flex-end;
-  text-align:right;
-  color:#EFEFEF;
-  font-size:clamp(14px,1.39vw,20px);
+.work:not(.work--right) .work-copy{left:calc(100% + 8px);}
+.work--right .work-copy{right:calc(100% + 8px);}
+.work-cat{
+  margin:0 0 14px;
+  font-size:20px;
   font-weight:300;
   letter-spacing:-.03em;
+  line-height:1.2;
+  color:#D7D4CC;
+}
+.work-title{
+  margin:0 0 20px;
+  font-size:clamp(30px,3.3vw,48px);
+  font-weight:500;
   line-height:1;
-  white-space:nowrap;
+  letter-spacing:-.01em;
+  color:var(--white);
+}
+.work-title a{color:inherit;}
+.work-desc{
+  margin:0;
+  max-width:40ch;
+  font-size:20px;
+  font-weight:300;
+  line-height:1.5;
+  color:rgba(255,255,255,.82);
+}
+/* not enough room beside the card — the copy drops underneath it */
+@media (max-width:1099px){
+  .work-copy{
+    position:static;
+    width:auto;
+    transform:none;
+    margin-top:var(--title-gap);
+  }
+  .work-title{font-size:clamp(26px,5.2vw,40px);margin-bottom:14px;}
+  .work-cat{font-size:16px;margin-bottom:10px;}
+  .work-desc{font-size:17px;}
+}
+@media (prefers-reduced-motion:reduce){
+  .work-copy{opacity:1;translate:none;filter:none;}
 }
 
 /* ============================================================
@@ -885,8 +889,9 @@ a{color:inherit;text-decoration:none;}
    ============================================================ */
 @media (max-width:1439px) and (min-width:901px){
   :root{
-    --card-w:82%;
-    --card-offset:18%;
+    --card-w:62%;           /* narrower than before so the copy fits beside it */
+    --card-offset:38%;
+    --text-ratio:.613;
     --card-gap:96px;
     --title-gap:18px;
     --works-tail:220px;
@@ -913,8 +918,6 @@ a{color:inherit;text-decoration:none;}
   .hero-name{font-size:16.2vw;}
   .hero-sub{font-size:4.032vw;}
   .works{padding:32px 16px var(--works-tail);}
-  .work-meta{gap:4px 14px;margin-top:14px;flex-wrap:wrap;}
-  .work-year{font-size:14px;}
   .footer-inner{padding:36px 16px 0;}
   .footer-icons{margin-left:0;}
   .aura-layer-1{filter:blur(85px);}
@@ -1023,11 +1026,12 @@ a{color:inherit;text-decoration:none;}
               <source src="assets/video/motion-reel-preview.mp4" type="video/mp4">
             </video>
           </div>
-          <div class="work-meta">
-            <h3 class="work-title">Motion Reel</h3>
-            <span class="work-year">Motion Graphics</span>
-          </div>
         </a></div>
+            <div class="work-copy">
+        <p class="work-cat">Motion Graphics</p>
+        <h3 class="work-title"><a href="projects/motion-reel.html">Motion Reel</a></h3>
+        <p class="work-desc">A montage of my motion work: kinetic type, transitions and pacing cut together into one piece. Every cut lands on the beat.</p>
+      </div>
       </article>
     </div>
 
@@ -1040,12 +1044,13 @@ a{color:inherit;text-decoration:none;}
             <source src="assets/video/true-detective-title.mp4" type="video/mp4">
           </video>
         </div>
-        <div class="work-meta">
-          <h3 class="work-title">True Detective Title Sequence</h3>
-          <span class="work-year">3D | Motion Graphics</span>
-        </div>
       </a></div>
-    </article>
+          <div class="work-copy">
+        <p class="work-cat">3D | Motion Graphics</p>
+        <h3 class="work-title"><a href="projects/true-detective.html">True Detective Title Sequence</a></h3>
+        <p class="work-desc">A gritty, narrative-driven opening built in 3D and finished in compositing. Grit and texture keep it true to the show.</p>
+      </div>
+      </article>
 
     <article class="work" id="gallery">
       <div class="work-reveal">
@@ -1053,12 +1058,13 @@ a{color:inherit;text-decoration:none;}
         <div class="work-thumb">
           <img src="assets/images/five-guys-kiosk.jpg" alt="Five Guys ordering kiosk interface" width="1604" height="902" loading="lazy">
         </div>
-        <div class="work-meta">
-          <h3 class="work-title">Five Guys Kiosk</h3>
-          <span class="work-year">UI/UX | Branding | Motion Graphics</span>
-        </div>
       </a></div>
-    </article>
+          <div class="work-copy">
+        <p class="work-cat">UI/UX | Branding | Motion Graphics</p>
+        <h3 class="work-title"><a href="projects/five-guys-kiosk.html">Five Guys Kiosk</a></h3>
+        <p class="work-desc">An ordering kiosk that makes building a burger fast, clear and true to the brand. Simple flows and the red-and-white look keep orders quick.</p>
+      </div>
+      </article>
 
     <article class="work work--right">
       <div class="work-reveal">
@@ -1066,12 +1072,13 @@ a{color:inherit;text-decoration:none;}
         <div class="work-thumb">
           <img src="assets/images/nc-drivers-license.jpg" alt="North Carolina digital driver's license app" width="1604" height="902" loading="lazy">
         </div>
-        <div class="work-meta">
-          <h3 class="work-title">North Carolina Drivers License</h3>
-          <span class="work-year">UI/UX | Branding | Motion Graphics</span>
-        </div>
       </a></div>
-    </article>
+          <div class="work-copy">
+        <p class="work-cat">UI/UX | Branding | Motion Graphics</p>
+        <h3 class="work-title"><a href="projects/nc-drivers-license.html">North Carolina Drivers License</a></h3>
+        <p class="work-desc">A digital driver's license app concept: secure, glanceable and easy to share. Key details stay front and center.</p>
+      </div>
+      </article>
 
   </main>
 </div>
@@ -1378,6 +1385,8 @@ a{color:inherit;text-decoration:none;}
      .work-reveal wrapper, not on .work itself — keeps .work's own
      geometry stable for targetFor()'s calculations below. */
   var reveals = works.map(function(el){ return el.querySelector('.work-reveal'); });
+  var copies  = works.map(function(el){ return el.querySelector('.work-copy'); });
+  var SIDE = window.matchMedia('(min-width:1100px)');
   var rafId = null;
   var introIndex = works.length - 1;   // introCard, when present, is pushed last
   var introHeld  = false;              // were we already inside the hold last tick?
@@ -1419,7 +1428,7 @@ a{color:inherit;text-decoration:none;}
     return clamp(t * 1.5, 0, 1);                      // reach full visibility a bit before dead-centre
   }
 
-  function apply(el, p, fromRight){
+  function apply(el, p, fromRight, copy, work){
     var x = (fromRight ? 425 : -425) * (1 - p);
     var y = 225 * (1 - p);
     /* settles at .9, not 1 — the card sits 10% smaller than it used to
@@ -1432,6 +1441,27 @@ a{color:inherit;text-decoration:none;}
     el.style.translate = x.toFixed(1) + 'px ' + y.toFixed(1) + 'px';
     el.style.scale = s.toFixed(3);
     el.style.filter = blur > .1 ? 'blur(' + blur.toFixed(1) + 'px)' : 'none';
+    if(!copy) return;
+    /* the copy shares the card's progress: same opacity + blur, and a
+       position that travels from the side the card is NOT on —
+       off-page left beside a left card, from behind the card beside a
+       right card. Below the side-by-side breakpoint it simply rises in. */
+    copy.style.opacity = p;
+    copy.style.filter = blur > .1 ? 'blur(' + blur.toFixed(1) + 'px)' : 'none';
+    if(!SIDE.matches){
+      copy.style.translate = '0px ' + (40 * (1 - p)).toFixed(1) + 'px';
+      return;
+    }
+    var wr = work.getBoundingClientRect();
+    var cx;
+    if(fromRight){
+      /* copy sits left of the card: start it tucked behind the card */
+      cx = (8 + 425 + wr.width * .155 + 40) * (1 - p);
+    } else {
+      /* copy sits right of the card: start it fully off the left edge */
+      cx = -(wr.right + 8 + copy.offsetWidth + 40) * (1 - p);
+    }
+    copy.style.translate = cx.toFixed(1) + 'px ' + y.toFixed(1) + 'px';
   }
 
   function tick(){
@@ -1441,7 +1471,7 @@ a{color:inherit;text-decoration:none;}
       var next = current[i] + (target - current[i]) * LERP;
       if(Math.abs(target - next) > EPS) settled = false;
       current[i] = next;
-      apply(reveals[i], next, el.classList.contains('work--right'));
+      apply(reveals[i], next, el.classList.contains('work--right'), copies[i], el);
     });
     rafId = settled ? null : window.requestAnimationFrame(tick);
   }
