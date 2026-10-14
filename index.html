@@ -748,16 +748,19 @@ a{color:inherit;text-decoration:none;}
   z-index:1;
   width:calc(var(--text-ratio) * 100% - 32px);
   transform:translateY(-50%);
-  /* the title motion from the Capstone I file (node 2172:192), minus its
-     downward travel: opacity ease-in-out, a 100px blur that clears on
-     the cubic-bezier(.5,0,.5,1) curve, all in .5s. Position is sideways
-     instead — --from-x is set per card by the script at the bottom. */
+  /* motion read from the Home frame in the Capstone I file (nodes 2810:14
+     and 2810:18): every copy block starts 430px to the LEFT of its resting
+     spot, blurred 100px and transparent, and settles in .5s (25% of the
+     file's 2s loop) — opacity ease-in-out, blur cubic-bezier(.5,0,.5,1),
+     position linear. Beside a left card that start point is tucked behind
+     the card; beside a right card it is off the left of the page. */
+  --from-x:-430px;
   opacity:0;
   filter:blur(100px);
-  translate:var(--from-x,0px) 0;
+  translate:var(--from-x) 0;
   transition:opacity .5s ease-in-out,
              filter .5s cubic-bezier(.5,0,.5,1),
-             translate .5s ease-in-out;
+             translate .5s linear;
   will-change:opacity,translate,filter;
 }
 .work-copy.is-in{opacity:1;filter:blur(0);translate:0 0;}
@@ -791,6 +794,7 @@ a{color:inherit;text-decoration:none;}
 /* not enough room beside the card — the copy drops underneath it */
 @media (max-width:1099px){
   .work-copy{
+    --from-x:0px;
     position:static;
     width:auto;
     transform:none;
@@ -1460,23 +1464,6 @@ a{color:inherit;text-decoration:none;}
     if(!on && p > .55) copy.classList.add('is-in');
     else if(on && p < .3) copy.classList.remove('is-in');
   }
-
-  /* where each copy starts from: off-page left beside a left card, tucked
-     behind the card beside a right card (sideways only, no vertical). */
-  function setFrom(){
-    works.forEach(function(el, i){
-      var copy = copies[i]; if(!copy) return;
-      if(!SIDE.matches){ copy.style.setProperty('--from-x','0px'); return; }
-      var w = el.offsetWidth, cw = copy.offsetWidth, x;
-      if(el.classList.contains('work--right')) x = 8 + 425 * .5 + w * .155 * .5 + 40;
-      else x = -(window.innerWidth / 2 + w + cw + 40);
-      copy.style.setProperty('--from-x', x.toFixed(0) + 'px');
-    });
-  }
-  setFrom();
-  window.addEventListener('resize', setFrom);
-  window.addEventListener('load', setFrom);
-  if(document.fonts && document.fonts.ready) document.fonts.ready.then(setFrom);
 
   function tick(){
     var settled = true;
