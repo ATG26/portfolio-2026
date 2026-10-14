@@ -257,7 +257,7 @@ a{color:inherit;text-decoration:none;}
 /* ---- next project: the other case studies, as a row of cards ---- */
 .project-next{
   display:block;
-  padding:96px var(--gutter);
+  padding:48px var(--gutter) 120px;
   background:var(--footer-base);
   color:var(--white);
   border-top:1px solid rgba(255,255,255,.14);
@@ -267,18 +267,18 @@ a{color:inherit;text-decoration:none;}
   margin:0 auto;
 }
 .project-next-eyebrow{
-  margin:0 0 14px;
+  margin:0 0 12px;
   font-size:16px;
   font-weight:500;
   text-transform:uppercase;
-  letter-spacing:.06em;
-  opacity:.6;
+  letter-spacing:.02em;
+  color:#D7D4CC;
 }
 .project-next-label{
-  margin:0 0 clamp(32px,4vw,56px);
+  margin:0 0 clamp(28px,3vw,44px);
   font-size:clamp(40px,4.44vw,64px);
   font-weight:500;
-  line-height:normal;
+  line-height:.72;
 }
 .project-cards{
   display:grid;
@@ -335,7 +335,7 @@ a{color:inherit;text-decoration:none;}
 }
 .project-card-title::after{content:" \2197";opacity:.7;}
 @media (max-width:900px){
-  .project-next{padding:64px var(--gutter);}
+  .project-next{padding:40px var(--gutter) 72px;}
   .project-cards{grid-template-columns:1fr;gap:32px;}
 }
 
@@ -432,7 +432,7 @@ a{color:inherit;text-decoration:none;}
   .project-facts{grid-template-columns:1fr 1fr;gap:22px 20px;}
   .project-section{padding:64px 16px;}
   .project-twocol{grid-template-columns:1fr;gap:36px;}
-  .project-next{padding:64px 16px;}
+  .project-next{padding:40px 16px 72px;}
   .footer-inner{padding:28px 20px 24px;}
   .footer-cols{flex-wrap:wrap;gap:32px;margin-bottom:36px;}
   .footer-col,.footer-col:last-child{width:auto;}
