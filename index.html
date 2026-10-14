@@ -748,22 +748,27 @@ a{color:inherit;text-decoration:none;}
   z-index:1;
   width:calc(var(--text-ratio) * 100% - 32px);
   transform:translateY(-50%);
-  /* motion read from the Home frame in the Capstone I file (nodes 2810:14
-     and 2810:18): every copy block starts 430px to the LEFT of its resting
-     spot, blurred 100px and transparent, and settles in .5s (25% of the
-     file's 2s loop) — opacity ease-in-out, blur cubic-bezier(.5,0,.5,1),
-     position linear. Beside a left card that start point is tucked behind
-     the card; beside a right card it is off the left of the page. */
+  /* same start state as the Home frame in the Capstone I file (430px to the
+     left of its resting spot, 100px blur, transparent), but paced like the
+     rest of the site: the card hover/reveal curve cubic-bezier(.16,.84,.44,1)
+     (fast start, long soft landing) over ~1.2s, close to the footer's 1.7s
+     entrance. Leaving is quicker so it never lingers behind the card. */
   --from-x:-430px;
+  --ease-site:cubic-bezier(.16,.84,.44,1);
   opacity:0;
   filter:blur(100px);
   translate:var(--from-x) 0;
-  transition:opacity .5s ease-in-out,
-             filter .5s cubic-bezier(.5,0,.5,1),
-             translate .5s linear;
+  transition:opacity .55s var(--ease-site),
+             filter .6s var(--ease-site),
+             translate .6s var(--ease-site);
   will-change:opacity,translate,filter;
 }
-.work-copy.is-in{opacity:1;filter:blur(0);translate:0 0;}
+.work-copy.is-in{
+  opacity:1;filter:blur(0);translate:0 0;
+  transition:opacity 1s var(--ease-site) .1s,
+             filter 1.2s var(--ease-site) .1s,
+             translate 1.3s var(--ease-site) .1s;
+}
 .work:not(.work--right) .work-copy{left:calc(100% + 8px);}
 .work--right .work-copy{right:calc(100% + 8px);}
 .work-cat{
@@ -805,7 +810,7 @@ a{color:inherit;text-decoration:none;}
   .work-desc{font-size:17px;}
 }
 @media (prefers-reduced-motion:reduce){
-  .work-copy{opacity:1;translate:none;filter:none;transition:none;}
+  .work-copy,.work-copy.is-in{opacity:1;translate:none;filter:none;transition:none;}
 }
 
 /* ============================================================
