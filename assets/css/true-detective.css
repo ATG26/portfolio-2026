@@ -21,14 +21,11 @@ body.td{
 
 /* ---- title + facts band ---- */
 .td-band{
-  background:var(--td-band) url("../images/true-detective-band.jpg") center/cover no-repeat;
+  background:#0C0F0F;
   padding:clamp(18px,1.5vw,22px) var(--gutter) clamp(36px,3.9vw,56px);
   position:relative;
   overflow:hidden;
 }
-/* the same drifting aurora as the footer, laid over the static gradient */
-.td-band [class^="aura-layer-"]{opacity:.55;}
-.td-band .aura-layer-5{opacity:.35;}
 .td-band-rule{border:0;border-top:1px solid rgba(255,255,255,.14);margin:0 0 clamp(20px,2.4vw,34px);}
 .td-band-inner{position:relative;z-index:1;max-width:var(--content);margin:0 auto;}
 .td-title{
