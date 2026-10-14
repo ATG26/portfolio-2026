@@ -279,7 +279,7 @@ a{color:inherit;text-decoration:none;}
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:clamp(16px,2vw,32px);
 }
-.project-card{display:block;color:var(--white);}
+.project-card{display:block;position:relative;color:var(--white);}
 .project-card-thumb{
   position:relative;
   aspect-ratio:16/9;
@@ -291,16 +291,35 @@ a{color:inherit;text-decoration:none;}
   display:block;
   width:100%;height:100%;
   object-fit:cover;
-  transition:transform .6s cubic-bezier(.16,.84,.44,1), opacity .3s ease;
+  transition:transform .6s cubic-bezier(.16,.84,.44,1);
 }
-.project-card:hover .project-card-thumb img{transform:scale(1.05);}
+/* black gradient that supports the title once it appears on hover */
+.project-card-thumb::after{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(to top, rgba(0,0,0,.82) 0%, rgba(0,0,0,.45) 32%, rgba(0,0,0,0) 62%);
+  opacity:0;
+  transition:opacity .4s ease;
+  pointer-events:none;
+}
+.project-card:hover .project-card-thumb img{transform:scale(1.04);}
+.project-card:hover .project-card-thumb::after,
+.project-card:focus-visible .project-card-thumb::after{opacity:1;}
+/* the name lives on the image — hidden until hover, like the homepage cards */
 .project-card-meta{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:baseline;
-  justify-content:space-between;
-  gap:4px 16px;
-  margin-top:14px;
+  position:absolute;
+  left:0;right:0;bottom:0;
+  padding:0 20px 18px;
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity .4s ease, transform .4s ease;
+  pointer-events:none;
+}
+.project-card:hover .project-card-meta,
+.project-card:focus-visible .project-card-meta{opacity:1;transform:none;}
+@media (hover:none){
+  .project-card-thumb::after{opacity:1;}
+  .project-card-meta{opacity:1;transform:none;}
 }
 .project-card-title{
   margin:0;
@@ -308,7 +327,7 @@ a{color:inherit;text-decoration:none;}
   font-weight:500;
   line-height:1.2;
 }
-.project-card-title::after{content:" \2197";opacity:.6;}
+.project-card-title::after{content:" \2197";opacity:.7;}
 @media (max-width:900px){
   .project-next{padding:64px var(--gutter);}
   .project-cards{grid-template-columns:1fr;gap:32px;}
